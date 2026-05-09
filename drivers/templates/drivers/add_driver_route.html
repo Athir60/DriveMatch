@@ -1,0 +1,124 @@
+{% extends 'main/base.html' %}
+{% block title %}Add Route — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content" style="max-width:720px;">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:service_settings' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Service Settings</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Add New Route</h2>
+            <p>Set your availability and pricing for a new route</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger mb-3">
+            <strong>Please correct the errors below.</strong>
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <div style="font-size:13px; margin-top:4px;">{{ field|title }}: {{ error }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="dm-card">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="dm-label">Route</label>
+                    {{ form.route }}
+                    {% if form.route.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.route.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="dm-label">Available Days</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+                        {% for choice in form.days %}
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;
+                               border:1px solid #e0e0e0; border-radius:6px; padding:6px 12px;
+                               background:#fff; font-size:13px;">
+                            {{ choice.tag }} {{ choice.choice_label }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.days.errors %}
+                    <div class="text-danger" style="font-size:12px; margin-top:4px;">{{ form.days.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="dm-label">Start Time</label>
+                        {{ form.start_time }}
+                        {% if form.start_time.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.start_time.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">End Time</label>
+                        {{ form.end_time }}
+                        {% if form.end_time.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.end_time.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="dm-label">Monthly Price (SAR)</label>
+                        {{ form.monthly_price }}
+                        {% if form.monthly_price.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.monthly_price.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">Commitment Duration</label>
+                        {{ form.commitment_duration }}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2" style="font-size:13px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between mt-2">
+                    <a href="{% url 'drivers:service_settings' %}" class="btn-dm-outline">Cancel</a>
+                    <button type="submit" class="btn-dm-black">Add Route</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

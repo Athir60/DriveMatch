@@ -1,0 +1,79 @@
+{% extends 'main/base.html' %}
+{% block title %}Messages — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Messages</h2>
+            <p>Your conversations with passengers</p>
+        </div>
+
+        <!-- Messages layout matching wireframe -->
+        <div class="dm-card p-0" style="display:flex; min-height:480px; overflow:hidden;">
+
+            <!-- Conversations list -->
+            <div style="width:240px; border-right:1px solid #e0e0e0; background:#fff; flex-shrink:0;">
+                <div style="padding:14px 16px; border-bottom:1px solid #f0f0f0; font-weight:600; font-size:14px;">
+                    <i class="fa-solid fa-comments"></i> Conversations
+                </div>
+                <!-- Placeholder conversation item -->
+                <div style="padding:40px 16px; text-align:center; color:#999; font-size:13px;">
+                    No conversations yet.
+                </div>
+            </div>
+
+            <!-- Message area -->
+            <div style="flex:1; display:flex; flex-direction:column; background:#fafafa;">
+                <div style="flex:1; display:flex; align-items:center; justify-content:center;
+                            color:#999; font-size:14px; flex-direction:column; gap:12px;">
+                    <div style="font-size:40px;"><i class="fa-solid fa-comments"></i></div>
+                    <p style="margin:0;">No messages yet.</p>
+                    <p style="font-size:13px; margin:0; color:#bbb; text-align:center; max-width:280px;">
+                        Messages from passengers will appear here once you start receiving bookings.
+                    </p>
+                </div>
+
+                <!-- Message input (disabled placeholder) -->
+                <div style="border-top:1px solid #e0e0e0; padding:14px 16px;
+                            display:flex; gap:10px; align-items:center; background:#fff;">
+                    <span style="font-size:20px; color:#999; cursor:not-allowed;">+</span>
+                    <input type="text" class="form-control"
+                           placeholder="Type your message..."
+                           disabled style="background:#f5f5f5;">
+                    <button class="btn-dm-black" style="padding:8px 20px;" disabled>Send</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="dm-card-sm mt-3" style="background:#f9f9f9; font-size:13px; color:#666;">
+            ℹ Real-time messaging will be available in a future update.
+            For urgent matters, please use the
+            <a href="{% url 'support:contact' %}">Contact Support</a> page.
+        </div>
+
+    </div>
+</div>
+{% endblock %}

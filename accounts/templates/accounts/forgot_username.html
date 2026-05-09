@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+{% block title %}Forgot Username — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-auth-page">
+    <div class="dm-auth-shell" style="max-width:460px;">
+
+
+        <div class="dm-auth-box text-center">
+            <a href="{% url 'accounts:sign_in' %}" class="dm-back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <div class="dm-auth-brand">
+                <span class="mark"><i class="fa-solid fa-car-side"></i></span>
+                <span class="name">DriveMatch</span>
+            </div>
+            <div style="font-size:36px; margin-bottom:8px;"><i class="fa-solid fa-user"></i></div>
+            <h2>Forgot Username?</h2>
+            <p class="subtitle">No problem — here's how to find it</p>
+
+            <div style="background:#f9f9f9; border:1px solid #e0e0e0; border-radius:8px;
+                        padding:18px; text-align:left; margin-bottom:20px;">
+                <p style="font-size:14px; color:#444; margin-bottom:10px;">
+                    On DriveMatch, your <strong>username is your registered email address</strong>.
+                </p>
+                <p style="font-size:14px; color:#444; margin-bottom:10px;">
+                    Simply enter the email you used when you created your account on the sign-in page.
+                </p>
+                <p style="font-size:14px; color:#444; margin:0;">
+                    Tip: Email login is not case-sensitive —
+                    <em>ahmed@gmail.com</em> and <em>AHMED@GMAIL.COM</em> both work.
+                </p>
+            </div>
+
+            <a href="{% url 'accounts:sign_in' %}" class="btn-dm-black w-100 mb-3"
+               style="display:block; padding:12px;">Try Signing In</a>
+
+            <div class="dm-divider">or</div>
+
+            <p style="font-size:14px; margin-bottom:8px;">Forgot your password too?</p>
+            <a href="{% url 'accounts:forgot_password' %}" class="btn-dm-outline w-100"
+               style="display:block; padding:10px; margin-bottom:16px;">Reset Password</a>
+
+            <p style="font-size:13px; color:#666; margin:0;">
+                Still having trouble?
+                <a href="{% url 'support:contact' %}">Contact Support</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

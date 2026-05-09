@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+{% block title %}Ratings — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link active">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>Ratings</h2>
+            <p>View all subscriber ratings</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_count }}</div>
+                    <div class="stat-label">Total Ratings</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ average_rating }}</div>
+                    <div class="stat-label">Average Rating<br>Out of 5</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ratings list -->
+        {% for rating in ratings %}
+        <div class="dm-card mb-3">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <span style="font-size:16px; color:#111;">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= rating.stars %}<i class="fa-solid fa-star"></i>{% else %}<i class="fa-regular fa-star"></i>{% endif %}
+                            {% endfor %}
+                        </span>
+                        <span style="font-size:14px; font-weight:700;">{{ rating.stars }}.0</span>
+                    </div>
+                    <div style="font-size:12px; color:#999; margin-bottom:6px;">
+                        {{ rating.created_at|date:"d M Y" }}
+                        · Trip: {{ rating.booking.driver_route.route.from_area }} → {{ rating.booking.driver_route.route.to_area }}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:14px; font-weight:600;">{{ rating.passenger.user.get_full_name }}</div>
+                </div>
+            </div>
+            {% if rating.comment %}
+            <p style="font-size:14px; color:#555; margin:6px 0 0; line-height:1.5;">{{ rating.comment }}</p>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="dm-card text-center py-5 text-muted">
+            <div style="font-size:40px; margin-bottom:12px;"><i class="fa-solid fa-star"></i></div>
+            <h5>No ratings yet</h5>
+            <p>Ratings will appear here once passengers complete their bookings.</p>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if ratings.has_other_pages %}
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            {% if ratings.has_previous %}
+                <a href="?page={{ ratings.previous_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+            {% endif %}
+            <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+                {{ ratings.number }} / {{ ratings.paginator.num_pages }}
+            </span>
+            {% if ratings.has_next %}
+                <a href="?page={{ ratings.next_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dm-card-sm mt-4" style="font-size:13px; color:#666;">
+            ℹ Ratings help us improve our services and recognize top-performing drivers. Thank you for your valuable feedback.
+        </div>
+    </div>
+</div>
+{% endblock %}

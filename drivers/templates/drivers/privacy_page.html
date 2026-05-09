@@ -1,0 +1,107 @@
+{% extends 'main/base.html' %}
+{% block title %}Privacy Policy — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content" style="max-width:760px;">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Privacy Policy</h2>
+            <p class="text-muted" style="font-size:13px;">Last updated: January 2026</p>
+        </div>
+
+        <div class="dm-card">
+
+            <h5>1. Data We Collect</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                When you register as a driver on DriveMatch, we collect the following information:
+                your full name, email address, phone number, and national ID or Iqama number.
+                We also collect details about your vehicle including make, model, year, color,
+                license plate, and car photo.
+            </p>
+
+            <h5>2. Identity and Verification Documents</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                To verify your identity and ensure the safety of our passengers, we collect
+                photos of your ID or Iqama (front and back) and your driver's license.
+                These documents are reviewed by our team and are not shared publicly.
+                Only authorized DriveMatch staff can access your verification documents.
+            </p>
+
+            <h5>3. Location and Routes</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                We store the routes and neighborhoods you make available for booking.
+                This information is shown to passengers searching for a driver on your routes.
+            </p>
+
+            <h5>4. Payments and Invoices</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                Booking payments made by passengers are recorded in the system.
+                Your bank account details (if provided for payout settings) are stored securely
+                and used only to process your earnings payouts. We do not store full card numbers
+                — only the last 4 digits for reference.
+            </p>
+
+            <h5>5. Ratings and Reviews</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                Passengers can rate your service after completing a booking.
+                Ratings and comments are stored and may be shown on your public driver profile
+                to help passengers make informed decisions.
+            </p>
+
+            <h5>6. Support Tickets and Complaints</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                When you submit a support ticket or a complaint is filed against you,
+                the content of that ticket is visible to DriveMatch support staff.
+                We use this information to resolve disputes and improve our service.
+            </p>
+
+            <h5>7. Data Protection</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                Your password is securely hashed and is never stored in plain text.
+                All uploaded documents are stored on our secure server.
+                We take reasonable measures to protect your personal data from unauthorized access.
+            </p>
+
+            <h5>8. Your Rights</h5>
+            <p style="font-size:14px; color:#444; line-height:1.7;">
+                You have the right to access, update, or request deletion of your personal data.
+                To exercise these rights, please contact our support team.
+            </p>
+
+            <h5>9. Contact</h5>
+            <p style="font-size:14px; color:#444; margin:0;">
+                For any privacy-related questions, please contact us at
+                <strong>support@drivematch.com</strong> or use our
+                <a href="{% url 'support:contact' %}">support page</a>.
+            </p>
+
+        </div>
+
+        <div style="margin-top:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="btn-dm-outline"><i class="fa-solid fa-arrow-left"></i> Back to More</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

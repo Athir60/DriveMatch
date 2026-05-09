@@ -1,0 +1,81 @@
+{% extends 'main/base.html' %}
+{% block title %}Verify Code — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-auth-page">
+    <div class="dm-auth-shell" style="max-width:460px;">
+
+
+        <!-- Step indicator -->
+        <div class="dm-steps mb-4" style="max-width:340px; margin:0 auto 20px;">
+            <div class="dm-step">
+                <div class="dm-step-circle done"><i class="fa-solid fa-check"></i></div>
+                <div class="dm-step-label">Enter Email</div>
+            </div>
+            <div class="dm-step-line done"></div>
+            <div class="dm-step">
+                <div class="dm-step-circle active">2</div>
+                <div class="dm-step-label active">Verify Code</div>
+            </div>
+            <div class="dm-step-line"></div>
+            <div class="dm-step">
+                <div class="dm-step-circle">3</div>
+                <div class="dm-step-label">New Password</div>
+            </div>
+        </div>
+
+        <div class="dm-auth-box">
+            <a href="{% url 'accounts:forgot_password' %}" class="dm-back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <div class="dm-auth-brand">
+                <span class="mark"><i class="fa-solid fa-car-side"></i></span>
+                <span class="name">DriveMatch</span>
+            </div>
+            <div class="text-center mb-3">
+                <div style="font-size:36px;"><i class="fa-solid fa-envelope-open"></i></div>
+                <h2 style="margin-top:8px;">Enter Verification Code</h2>
+                <p class="subtitle">Step 2 of 3</p>
+            </div>
+
+            {% if reset_email %}
+            <div class="dm-card-sm mb-3" style="background:#f9f9f9; font-size:13px;">
+                Sending code to: <strong>{{ reset_email }}</strong>
+            </div>
+            {% endif %}
+
+            {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label class="dm-label">6-Digit Verification Code</label>
+                    <p style="font-size:12px; color:#666; margin-bottom:8px;">
+                        The code was shown in the green message on the previous page.
+                    </p>
+                    {{ form.code }}
+                    {% if form.code.errors %}
+                        <div class="text-danger" style="font-size:12px; margin-top:4px;">{{ form.code.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn-dm-black w-100">Verify Code</button>
+            </form>
+
+            <p class="text-center mt-3" style="font-size:13px; color:#666;">
+                Didn't get a code?
+                <a href="{% url 'accounts:forgot_password' %}">Try again</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'main/base.html' %}
+{% block title %}Sign In — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-auth-page">
+    <div class="dm-auth-shell">
+
+        <div class="dm-auth-box">
+            <a href="{% url 'main:landing' %}" class="dm-back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <div class="dm-auth-brand">
+                <span class="mark"><i class="fa-solid fa-car-side"></i></span>
+                <span class="name">DriveMatch</span>
+            </div>
+
+            <h2>Sign In</h2>
+            <p class="subtitle">Please enter your registered email and password</p>
+
+            {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="dm-label">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-2">
+                    <label class="dm-label">Password</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Forgot links -->
+                <div class="d-flex justify-content-between mb-3" style="font-size:13px;">
+                    <a href="{% url 'accounts:forgot_username' %}">Forgot username?</a>
+                    <a href="{% url 'accounts:forgot_password' %}">Forgot password?</a>
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2" style="font-size:13px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-dm-black w-100">Sign In</button>
+            </form>
+
+            <div class="dm-divider">or</div>
+
+            <p class="text-center" style="font-size:14px;">
+                Don't have an account?
+                <a href="{% url 'accounts:passenger_register' %}">Sign up as passenger</a>
+            </p>
+            <p class="text-center" style="font-size:14px;">
+                Want to drive?
+                <a href="{% url 'drivers:driver_register_step1' %}">Register as driver</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

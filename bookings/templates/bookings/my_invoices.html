@@ -1,0 +1,106 @@
+{% extends 'main/base.html' %}
+{% block title %}My Invoices — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="dm-page-header">
+        <h2>Invoices</h2>
+        <p>View and download your invoices and payment history.</p>
+    </div>
+
+    <!-- Invoices table -->
+    <div class="dm-card p-0 mb-4">
+        <table class="dm-table">
+            <thead>
+                <tr>
+                    <th>Invoice ID</th>
+                    <th>Booking</th>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td style="font-weight:600; font-size:13px;">{{ invoice.invoice_number }}</td>
+                    <td style="font-size:13px; color:#666;">#{{ invoice.booking.id }}</td>
+                    <td style="font-size:13px;">
+                        {{ invoice.booking.driver_route.route.from_area }} →
+                        {{ invoice.booking.driver_route.route.to_area }}
+                    </td>
+                    <td style="font-size:13px; color:#666;">{{ invoice.issued_date|date:"d M Y" }}</td>
+                    <td style="font-weight:600;">{{ invoice.amount }} SAR</td>
+                    <td>
+                        {% if invoice.is_paid %}
+                            <span class="badge-active">Paid</span>
+                        {% else %}
+                            <span class="badge-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if invoice.booking.contract %}
+                        <a href="{% url 'bookings:contract_detail' invoice.booking.contract.id %}"
+                           class="btn-dm-outline" style="font-size:12px; padding:5px 10px;">
+                            <i class="fa-solid fa-print"></i> View
+                        </a>
+                        {% else %}
+                        <span style="font-size:12px; color:#999;">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        No invoices yet. Invoices are generated after a confirmed booking.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary -->
+    {% if invoices %}
+    <div class="dm-card">
+        <h6 style="font-weight:700; margin-bottom:12px;">Invoices Summary</h6>
+        <div class="row g-3">
+            <div class="col-md-3 text-center">
+                <div style="font-size:22px; font-weight:700;">{{ invoices.paginator.count }}</div>
+                <div style="font-size:12px; color:#999;">Total Invoices</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if invoices.has_other_pages %}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        {% if invoices.has_previous %}
+            <a href="?page={{ invoices.previous_page_number }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Previous</a>
+        {% endif %}
+        <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+            {{ invoices.number }} / {{ invoices.paginator.num_pages }}
+        </span>
+        {% if invoices.has_next %}
+            <a href="?page={{ invoices.next_page_number }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="dm-card-sm mt-4 d-flex justify-content-between align-items-center">
+        <p style="margin:0; font-size:13px; color:#666;">
+            ℹ Need help? Visit our Help Center for more information about invoices and payments.
+        </p>
+        <a href="{% url 'support:contact' %}" class="btn-dm-outline" style="font-size:13px; padding:5px 14px;">
+            Go to Help Center
+        </a>
+    </div>
+
+</div>
+{% endblock %}

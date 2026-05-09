@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+{% block title %}Privacy Policy — DriveMatch{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:760px;">
+    <div class="dm-card">
+        <h2 style="font-weight:700; margin-bottom:6px;">Privacy Policy</h2>
+        <p class="text-muted" style="font-size:13px; margin-bottom:28px;">Last updated: January 2026</p>
+
+        <h5>1. Information We Collect</h5>
+        <p>We collect personal information including your name, email address, phone number, national ID, and vehicle information when you register as a driver or passenger.</p>
+
+        <h5>2. How We Use Your Information</h5>
+        <p>Your information is used to provide the platform service, verify driver identity, process bookings and payments, and send important notifications.</p>
+
+        <h5>3. Data Security</h5>
+        <p>We take reasonable steps to protect your personal data. Passwords are securely hashed and documents are stored securely.</p>
+
+        <h5>4. Sharing of Information</h5>
+        <p>We do not sell your personal information. Driver and passenger information is shared between each other only as necessary to complete a booking.</p>
+
+        <h5>5. Your Rights</h5>
+        <p>You have the right to access, update, or delete your personal information by contacting our support team.</p>
+
+        <h5>6. Contact</h5>
+        <p>For any privacy-related questions, please contact us at <strong>support@drivematch.com</strong>.</p>
+
+        <a href="{% url 'main:landing' %}" class="btn-dm-outline mt-2"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+</div>
+{% endblock %}

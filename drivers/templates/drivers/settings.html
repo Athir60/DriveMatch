@@ -1,0 +1,188 @@
+{% extends 'main/base.html' %}
+{% block title %}Settings — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <!-- Sidebar -->
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_settings' %}" class="sidebar-link active">Settings</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>Settings</h2>
+            <p>Manage your account, personal information, and vehicle details</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- 1. Change Email Address Section (Verification Flow) -->
+        <div class="dm-card mb-4">
+            <h6 style="font-weight:700; margin-bottom:12px;">Change Email Address</h6>
+            <div class="d-flex align-items-center mb-3">
+                <span style="font-size:13px; color:#666;">Current email: <strong>{{ request.user.email }}</strong></span>
+                {% if driver_profile.is_email_verified %}
+                    <span class="ms-2 badge bg-success-soft" style="color: #198754; background: #e8f5e9; font-size: 11px; padding: 4px 8px; border-radius: 4px;"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                {% else %}
+                    <span class="ms-2 badge bg-danger-soft" style="color: #dc3545; background: #ffebee; font-size: 11px; padding: 4px 8px; border-radius: 4px;"><i class="fa-solid fa-triangle-exclamation"></i>️ Action Required</span>
+                {% endif %}
+            </div>
+            
+            <form method="POST" action="{% url 'accounts:request_email_change' %}">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-md-9">
+                        <input type="email" name="new_email" class="form-control" placeholder="Enter new email address" required>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn-dm-outline w-100">Send Code</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- 2. Personal Information (Now Editable) -->
+            <div class="dm-card mb-4">
+                <h6 style="font-weight:700; margin-bottom:16px;">Personal Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="dm-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ request.user.get_full_name }}" placeholder="Your legal name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="dm-label">Phone Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #fff; border-right: none; font-size: 14px;">+966</span>
+                            {{ profile_form.phone_number }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="dm-label">National ID / Iqama</label>
+                        {{ profile_form.national_id }}
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="dm-label">About / Bio</label>
+                    {{ profile_form.bio }}
+                </div>
+            </div>
+
+            <!-- 3. Vehicle Information -->
+            <div class="dm-card mb-4">
+                <h6 style="font-weight:700; margin-bottom:16px;">Vehicle Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="dm-label">Car Brand</label>
+                        {{ vehicle_form.brand }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="dm-label">Car Model</label>
+                        {{ vehicle_form.model }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Year</label>
+                        {{ vehicle_form.year }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Color</label>
+                        {{ vehicle_form.color }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Type</label>
+                        {{ vehicle_form.car_type }}
+                    </div>
+                </div>
+                <div class="row mb-0">
+                    <div class="col-md-4">
+                        <label class="dm-label">License Plate</label>
+                        {{ vehicle_form.license_plate }}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="dm-label">Car Photo</label>
+                        <div class="dm-file-upload">
+                             {{ vehicle_form.car_photo }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Verification Documents -->
+            <div class="dm-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 style="font-weight:700; margin:0;">Verification Documents</h6>
+                    <span style="font-size: 12px; color: #666;">Images must be clear and readable</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="dm-label">ID / Iqama (Front)</label>
+                        {{ profile_form.id_front }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">ID / Iqama (Back)</label>
+                        {{ profile_form.id_back }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">Driver License</label>
+                        {{ profile_form.driver_license }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Account Actions -->
+            <div class="dm-card mb-4">
+                <h6 style="font-weight:700; margin-bottom:12px;">Account Actions</h6>
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <strong>Log Out</strong>
+                        <div style="font-size:13px; color:#999;">Sign out from this device</div>
+                    </div>
+                    <a href="{% url 'accounts:sign_out' %}" class="btn-dm-outline">Log Out</a>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-5">
+                <a href="{% url 'drivers:driver_dashboard' %}" class="btn-dm-outline" style="padding: 10px 30px;">Cancel</a>
+                <div class="text-end">
+                    <button type="submit" class="btn-dm-black" style="padding: 10px 40px; font-weight: 600;">Save All Changes</button>
+                    <p style="font-size:11px; color:#999; margin-top:8px; margin-bottom:0;">
+                        Changes will be reviewed by the admin team if they affect your verification status.
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* تحسينات إضافية للتصميم */
+    .form-control:disabled { background-color: #f8f9fa; cursor: not-allowed; }
+    .btn-dm-black { background: #000; color: #fff; border: none; border-radius: 8px; transition: 0.2s; }
+    .btn-dm-black:hover { background: #333; }
+    .btn-dm-outline { border: 1px solid #e0e0e0; background: #fff; color: #333; border-radius: 8px; font-size: 14px; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-dm-outline:hover { background: #f5f5f5; border-color: #ccc; }
+</style>
+{% endblock %}

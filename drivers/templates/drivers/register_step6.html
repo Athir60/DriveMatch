@@ -1,0 +1,194 @@
+{% extends 'main/base.html' %}
+{% block title %}Register as Driver — Step 6{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-page-bg" style="padding:20px 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:960px; margin:0 auto 24px;">
+        <a href="{% url 'drivers:driver_register_step5' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="dm-pill-brand"><i class="fa-solid fa-car-side"></i> DriveMatch</div>
+        <span style="font-size:14px; color:var(--dm-text-2);">Register as Driver</span>
+    </div>
+
+    {% include 'drivers/_steps.html' with current_step=6 %}
+
+    <div style="max-width:960px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:28px;">
+            <p style="font-size:13px; color:var(--dm-text-2); margin-bottom:4px;">Step 6 of 7</p>
+            <h3 style="font-weight:700; margin-bottom:6px;">Subscription Plan</h3>
+            <p style="font-size:14px; color:var(--dm-text-2);">Choose a plan and complete payment to activate your driver account.</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        {% if not pending_payment %}
+        <!-- ─── PLAN SELECTION FORM ─────────────────────────────────────── -->
+        <form method="POST" id="planForm">
+            {% csrf_token %}
+
+            <h5 style="font-weight:700; margin-bottom:14px;">Select a Subscription Plan</h5>
+            <div class="row g-3 mb-4">
+                {% for plan in plans %}
+                <div class="col-md-3 col-sm-6">
+                    <label style="cursor:pointer; display:block; height:100%;">
+                        <input type="radio" name="plan_id" value="{{ plan.id }}"
+                               class="plan-radio" style="display:none;"
+                               {% if selected_plan_id == plan.id|stringformat:"s" %}checked
+                               {% elif forloop.first and not selected_plan_id %}checked{% endif %}>
+                        <div class="plan-card dm-card" style="text-align:center; border:2px solid var(--dm-border);
+                             transition:border 0.2s; height:100%; display:flex; flex-direction:column;">
+                            <h6 style="font-weight:700; margin-bottom:6px;">{{ plan.name }}</h6>
+                            <p style="font-size:12px; color:var(--dm-text-2); margin-bottom:12px;">{{ plan.description }}</p>
+                            <div style="margin-bottom:14px;">
+                                <span style="font-size:28px; font-weight:800;">{{ plan.price|floatformat:0 }}</span>
+                                <span style="font-size:13px; color:var(--dm-text-2);"> SAR</span><br>
+                                <span style="font-size:12px; color:var(--dm-text-3);">/ {{ plan.duration_days }} days</span>
+                            </div>
+                            <div class="plan-btn" style="margin-top:auto; padding:8px; border:1.5px solid var(--dm-text);
+                                 border-radius:6px; font-size:13px; font-weight:600;">
+                                {% if plan.price == 0 %}Free Trial{% else %}Select{% endif %}
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="dm-card text-center" style="color:var(--dm-text-3);">No subscription plans available.</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="freeSection" class="dm-card-sm mb-4"
+                 style="background:var(--dm-surface-2); border:1px solid var(--dm-border); display:none;">
+                <i class="fa-solid fa-circle-info"></i>
+                No payment required for the free trial. Click below to start your trial.
+            </div>
+
+            <div id="paidSection" class="dm-card-sm mb-4"
+                 style="background:var(--dm-surface-2); border:1px solid var(--dm-border); display:none;">
+                <i class="fa-solid fa-shield-halved"></i>
+                You will be securely charged via Moyasar after clicking continue. Your card data is handled
+                only by Moyasar — DriveMatch never stores your card information.
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'drivers:driver_register_step5' %}" class="btn-dm-outline"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                <button type="submit" id="submitBtn" class="btn-dm-black" style="padding:10px 32px;">
+                    Continue
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <!-- ─── PAYMENT VIA MOYASAR ─────────────────────────────────────── -->
+        <div class="dm-card mb-3">
+            <h6 style="font-weight:700; margin-bottom:12px;">Payment Summary</h6>
+            <div class="contract-row">
+                <span class="label">Plan</span>
+                <span class="value" style="font-weight:700;">{{ pending_payment.plan.name }}</span>
+            </div>
+            <div class="contract-row">
+                <span class="label">Duration</span>
+                <span class="value">{{ pending_payment.plan.duration_days }} days</span>
+            </div>
+            <div class="contract-row" style="border-top:1px solid var(--dm-border); margin-top:8px; padding-top:10px;">
+                <span class="label" style="font-weight:700;">Total</span>
+                <span class="value" style="font-size:20px; font-weight:800;">{{ pending_payment.amount }} SAR</span>
+            </div>
+        </div>
+
+        <div class="dm-card mb-4">
+            <h6 style="font-weight:700; margin-bottom:6px;">
+                <i class="fa-solid fa-credit-card"></i> Card Payment
+            </h6>
+            <p style="font-size:13px; color:var(--dm-text-2); margin-bottom:16px;">
+                Secure payment powered by Moyasar. Your card details are handled directly by
+                the payment provider — they are never sent to or stored by DriveMatch.
+            </p>
+            <!-- Moyasar form container — Moyasar JS renders card inputs here -->
+            <div class="mysr-form"></div>
+        </div>
+
+        <div class="dm-card-sm" style="font-size:12px; color:var(--dm-text-3); background:var(--dm-surface-2);">
+            <i class="fa-solid fa-lock"></i>
+            Your subscription will activate automatically after the payment is verified by Moyasar.
+        </div>
+
+ <div class="mt-3 d-flex justify-content-between">
+
+    <!-- زر الرجوع -->
+    <a href="{% url 'drivers:driver_register_step6' %}" class="dm-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Choose a different plan
+    </a>
+
+    <!-- 🔥 زر السكيب -->
+    <a href="{% url 'drivers:driver_register_step7' %}" class="dm-back-link">
+        Skip to verification <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
+</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not pending_payment %}
+<script>
+var planPrices = { {% for p in plans %}"{{ p.id }}": {{ p.price }}{% if not forloop.last %},{% endif %}{% endfor %} };
+
+function updatePlan() {
+    var sel = document.querySelector('input[name="plan_id"]:checked');
+    if (!sel) return;
+    var price = planPrices[sel.value] || 0;
+    document.getElementById('freeSection').style.display = price === 0 ? '' : 'none';
+    document.getElementById('paidSection').style.display = price > 0 ? '' : 'none';
+    document.getElementById('submitBtn').textContent = price > 0 ? 'Continue to Payment' : 'Start Free Trial';
+    document.querySelectorAll('.plan-radio').forEach(function(r) {
+        var card = r.nextElementSibling;
+        var btn = card.querySelector('.plan-btn');
+        if (r.checked) {
+            card.style.borderColor = 'var(--dm-text)';
+            btn.style.background = 'var(--dm-text)';
+            btn.style.color = 'var(--dm-bg)';
+        } else {
+            card.style.borderColor = 'var(--dm-border)';
+            btn.style.background = '';
+            btn.style.color = '';
+        }
+    });
+}
+document.querySelectorAll('.plan-radio').forEach(function(r) { r.addEventListener('change', updatePlan); });
+updatePlan();
+</script>
+{% endif %}
+
+{% if pending_payment and moyasar_key %}
+<!-- Moyasar JS Payment Form — card inputs are rendered by Moyasar, not Django -->
+<link rel="stylesheet" href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css">
+<script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    Moyasar.init({
+        element: '.mysr-form',
+        amount: {{ amount_halalas }},
+        currency: 'SAR',
+        description: 'DriveMatch Subscription — {{ pending_payment.plan.name }}',
+        publishable_api_key: '{{ moyasar_key }}',
+        callback_url: window.location.origin + '{% url "drivers:moyasar_payment_callback" pending_payment.id %}',
+        methods: ['creditcard'],
+        metadata: {
+            payment_type: 'driver_subscription',
+            sub_payment_id: '{{ pending_payment.id }}',
+            driver_id: '{{ pending_payment.driver.id }}'
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

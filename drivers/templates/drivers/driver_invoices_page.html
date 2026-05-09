@@ -1,0 +1,119 @@
+{% extends 'main/base.html' %}
+{% block title %}Invoices — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Invoices</h2>
+            <p>View and download your invoices and payment history.</p>
+        </div>
+
+        <!-- Invoices table -->
+        <div class="dm-card p-0 mb-4">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Contract</th>
+                        <th>Passenger</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td style="font-weight:600; font-size:13px;">{{ invoice.invoice_number }}</td>
+                        <td style="font-size:13px; color:#666;">
+                            {% if invoice.booking.contract %}
+                                {{ invoice.booking.contract.contract_number }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td style="font-size:13px;">
+                            {{ invoice.booking.passenger.user.get_full_name|default:invoice.booking.passenger.user.username }}
+                        </td>
+                        <td style="font-size:13px; color:#666;">
+                            {{ invoice.issued_date|date:"d M Y" }}
+                        </td>
+                        <td style="font-weight:600;">{{ invoice.amount }} SAR</td>
+                        <td>
+                            {% if invoice.is_paid %}
+                                <span class="badge-active">Paid</span>
+                            {% else %}
+                                <span class="badge-pending">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if invoice.booking.contract %}
+                            <a href="{% url 'bookings:contract_detail' invoice.booking.contract.id %}"
+                               class="btn-dm-outline" style="font-size:12px; padding:4px 10px;">
+                                <i class="fa-solid fa-print"></i> View
+                            </a>
+                            {% else %}
+                            <span style="font-size:12px; color:#999;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No invoices found yet.
+                            Invoices are generated when passengers confirm bookings.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if invoices.has_other_pages %}
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            {% if invoices.has_previous %}
+                <a href="?page={{ invoices.previous_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+            {% endif %}
+            <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+                {{ invoices.number }} / {{ invoices.paginator.num_pages }}
+            </span>
+            {% if invoices.has_next %}
+                <a href="?page={{ invoices.next_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dm-card-sm mt-4" style="font-size:13px; color:#666;">
+            ℹ Need help with an invoice?
+            <a href="{% url 'support:contact' %}">Contact our support team</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

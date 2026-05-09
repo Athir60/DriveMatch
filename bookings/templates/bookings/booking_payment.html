@@ -1,0 +1,122 @@
+{% extends 'main/base.html' %}
+{% block title %}Payment — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:600px;">
+
+    <a href="{% url 'bookings:my_bookings' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> My Bookings</a>
+
+    <div class="dm-page-header mt-3">
+        <h2>Complete Payment</h2>
+        <p>Booking #{{ booking.id }}</p>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <!-- Order Summary -->
+    <div class="dm-card mb-4">
+        <h6 style="font-weight:700; margin-bottom:12px;">Order Summary</h6>
+        <div class="contract-row">
+            <span class="label">Route</span>
+            <span class="value">
+                {{ booking.driver_route.route.from_area }} &rarr; {{ booking.driver_route.route.to_area }}
+            </span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Driver</span>
+            <span class="value">{{ booking.driver.user.get_full_name }}</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Duration</span>
+            <span class="value">{{ booking.subscription_months }} month{{ booking.subscription_months|pluralize }}</span>
+        </div>
+        <div class="contract-row" style="border-top:1px solid #eee; margin-top:8px; padding-top:8px;">
+            <span class="label" style="font-weight:700;">Total Amount</span>
+            <span class="value" style="font-size:20px; font-weight:700;">{{ payment.amount }} SAR</span>
+        </div>
+    </div>
+
+    {% if use_simulation %}
+    <!-- ── SIMULATION FALLBACK ──────────────────────────────────────────── -->
+    <div class="dm-card mb-4" style="border:2px solid #ffc107; background:#fffbe6;">
+        <div style="font-size:13px; color:#856404; margin-bottom:12px; font-weight:600;">
+            Simulation only — no real payment processed.
+        </div>
+        <p style="font-size:13px; color:#666; margin-bottom:0;">
+            To use real payment, configure <code>MOYASAR_PUBLISHABLE_KEY</code> in settings.py.
+            In simulation mode, click Confirm Payment to test the full booking flow.
+        </p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <form method="POST" action="{% url 'bookings:simulate_payment_success' payment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-dm-black w-100" style="padding:14px; font-size:15px;">
+                    Confirm Payment (Simulation)
+                </button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form method="POST" action="{% url 'bookings:simulate_payment_failed' payment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-dm-outline w-100"
+                        style="padding:14px; font-size:15px; color:#dc3545; border-color:#dc3545;">
+                    Simulate Payment Failure
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- ── MOYASAR PAYMENT FORM ─────────────────────────────────────────── -->
+    <div class="dm-card mb-4">
+        <h6 style="font-weight:700; margin-bottom:16px;">Card Payment</h6>
+        <p style="font-size:13px; color:#666; margin-bottom:16px;">
+            Secure payment powered by Moyasar. Your card details are handled directly by
+            the payment provider — they are never sent to or stored by DriveMatch.
+        </p>
+        <!-- Moyasar form container — Moyasar JS renders card inputs here -->
+        <div class="mysr-form"></div>
+    </div>
+    {% endif %}
+
+    <div class="dm-card-sm mt-3" style="font-size:12px; color:#888; background:#f9f9f9;">
+        Your booking will be confirmed automatically after successful payment.
+        The contract and invoice will be generated at that point.
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not use_simulation %}
+<!-- Moyasar JS Payment Form — card inputs are rendered by Moyasar, not Django -->
+<link rel="stylesheet" href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css">
+<script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    Moyasar.init({
+        element: '.mysr-form',
+        amount: {{ amount_halalas }},
+        currency: 'SAR',
+        description: 'DriveMatch Booking Payment — Booking #{{ booking.id }}',
+        publishable_api_key: '{{ moyasar_key }}',
+        callback_url: '{{ callback_url }}?local_payment_id={{ payment.id }}',
+        methods: ['creditcard'],
+        metadata: {
+            payment_type: 'passenger_booking',
+            booking_id: '{{ booking.id }}',
+            payment_id: '{{ payment.id }}',
+            user_id: '{{ request.user.id }}'
+        }
+    });
+ });
+</script>
+{% endif %}
+{% endblock %}

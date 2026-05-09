@@ -1,0 +1,73 @@
+{% comment %}
+  Reusable step progress bar for driver registration.
+  Usage: {% include 'drivers/_steps.html' with current_step=2 %}
+{% endcomment %}
+
+{% with steps="1,2,3,4,5,6,7" labels="Agree to Terms,Personal Info,Car Information,Routes,Availability,Subscription,Identity & Vehicle Verification" %}
+<div class="dm-steps" style="max-width:900px; margin:0 auto 28px;">
+
+    {% for num in "1234567" %}
+    {% with n=forloop.counter %}
+
+    {% if n == 1 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 1 %}active{% elif current_step > 1 %}done{% endif %}">
+                {% if current_step > 1 %}<i class="fa-solid fa-check"></i>{% else %}1{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 1 %}active{% endif %}">Agree to Terms</div>
+        </div>
+        {% if current_step > 1 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 2 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 2 %}active{% elif current_step > 2 %}done{% endif %}">
+                {% if current_step > 2 %}<i class="fa-solid fa-check"></i>{% else %}2{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 2 %}active{% endif %}">Personal Info</div>
+        </div>
+        {% if current_step > 2 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 3 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 3 %}active{% elif current_step > 3 %}done{% endif %}">
+                {% if current_step > 3 %}<i class="fa-solid fa-check"></i>{% else %}3{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 3 %}active{% endif %}">Car Information</div>
+        </div>
+        {% if current_step > 3 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 4 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 4 %}active{% elif current_step > 4 %}done{% endif %}">
+                {% if current_step > 4 %}<i class="fa-solid fa-check"></i>{% else %}4{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 4 %}active{% endif %}">Routes</div>
+        </div>
+        {% if current_step > 4 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 5 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 5 %}active{% elif current_step > 5 %}done{% endif %}">
+                {% if current_step > 5 %}<i class="fa-solid fa-check"></i>{% else %}5{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 5 %}active{% endif %}">Availability</div>
+        </div>
+        {% if current_step > 5 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 6 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 6 %}active{% elif current_step > 6 %}done{% endif %}">
+                {% if current_step > 6 %}<i class="fa-solid fa-check"></i>{% else %}6{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 6 %}active{% endif %}">Subscription</div>
+        </div>
+        {% if current_step > 6 %}<div class="dm-step-line done"></div>{% else %}<div class="dm-step-line"></div>{% endif %}
+    {% elif n == 7 %}
+        <div class="dm-step">
+            <div class="dm-step-circle {% if current_step == 7 %}active{% elif current_step > 7 %}done{% endif %}">
+                {% if current_step > 7 %}<i class="fa-solid fa-check"></i>{% else %}7{% endif %}
+            </div>
+            <div class="dm-step-label {% if current_step == 7 %}active{% endif %}">Identity & Vehicle Verification</div>
+        </div>
+    {% endif %}
+
+    {% endwith %}
+    {% endfor %}
+
+</div>
+{% endwith %}

@@ -1,0 +1,120 @@
+{% extends 'main/base.html' %}
+{% block title %}Subscribers — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link active">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>Subscribers</h2>
+            <p>View and manage your subscribers</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_count }}</div>
+                    <div class="stat-label">Total Subscribers</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ active_count }}</div>
+                    <div class="stat-label">Active Subscribers</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ confirmed_count }}</div>
+                    <div class="stat-label">Confirmed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="dm-card mb-3">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="dm-label">Subscription Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        {% for val, label in status_choices %}
+                        <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-dm-black w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="dm-card p-0">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td style="font-weight:600; font-size:14px;">{{ booking.passenger.user.get_full_name }}</td>
+                        <td style="font-size:13px; color:#666;">{{ booking.passenger.phone_number }}</td>
+                        <td style="font-size:13px; color:#666;">{{ booking.start_date|date:"Y-m-d" }}</td>
+                        <td style="font-size:13px; color:#666;">{{ booking.end_date|date:"Y-m-d" }}</td>
+                        <td>
+                            <span class="badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                        </td>
+                        <td style="font-weight:600;">{{ booking.total_price }} SAR</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No subscribers found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if bookings.has_other_pages %}
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            {% if bookings.has_previous %}
+                <a href="?page={{ bookings.previous_page_number }}&status={{ status_filter }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+            {% endif %}
+            <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+                {{ bookings.number }} / {{ bookings.paginator.num_pages }}
+            </span>
+            {% if bookings.has_next %}
+                <a href="?page={{ bookings.next_page_number }}&status={{ status_filter }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

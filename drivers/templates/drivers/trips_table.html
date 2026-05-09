@@ -1,0 +1,74 @@
+{% extends 'main/base.html' %}
+{% block title %}Trips Table — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link active">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>Trips Table</h2>
+            <p>View your upcoming trips by date</p>
+        </div>
+
+        <div class="dm-card p-0">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Route</th>
+                        <th>Time</th>
+                        <th>Subscriber</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td style="font-size:13px; color:#666;">
+                            {{ booking.start_date|date:"D" }}<br>
+                            <span style="font-size:12px;">{{ booking.start_date|date:"d M Y" }}</span>
+                        </td>
+                        <td>
+                            <strong style="font-size:13px;">
+                                {{ booking.driver_route.route.from_area }} → {{ booking.driver_route.route.to_area }}
+                            </strong>
+                        </td>
+                        <td style="font-size:13px; color:#666;">
+                            {{ booking.driver_route.start_time }} – {{ booking.driver_route.end_time }}
+                        </td>
+                        <td style="font-size:13px;">{{ booking.passenger.user.get_full_name }}</td>
+                        <td>
+                            <span class="badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No trips found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dm-card-sm mt-3" style="font-size:13px; color:#666;">
+            ℹ Trips are displayed based on start date. Active and upcoming bookings are shown here.
+        </div>
+    </div>
+</div>
+{% endblock %}

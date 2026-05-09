@@ -1,0 +1,108 @@
+{% extends 'main/base.html' %}
+{% block title %}Booking Detail — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:680px;">
+
+    <a href="{% url 'bookings:my_bookings' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> My Bookings</a>
+
+    <div class="dm-page-header mt-3">
+        <h2>Booking #{{ booking.id }}</h2>
+        <p>Created {{ booking.created_at|date:"d M Y" }}</p>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <div class="dm-card mb-4 text-center" style="background:#f9f9f9;">
+        <p style="margin:0; font-size:14px; color:#666;">Booking Status</p>
+        <span class="badge-{{ booking.status }}" style="font-size:15px; padding:5px 16px;">
+            {{ booking.get_status_display }}
+        </span>
+    </div>
+
+    <div class="dm-card mb-3">
+        <h5 style="font-weight:700; margin-bottom:12px;">Trip Information</h5>
+        <div class="contract-row">
+            <span class="label">Route</span>
+            <span class="value">{{ booking.driver_route.route.from_area }} → {{ booking.driver_route.route.to_area }}</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Driver</span>
+            <span class="value">
+                <a href="{% url 'drivers:driver_profile_view' booking.driver.id %}">
+                    {{ booking.driver.user.get_full_name|default:booking.driver.user.username }}
+                </a>
+            </span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Trip Time</span>
+            <span class="value">{{ booking.driver_route.start_time }} – {{ booking.driver_route.end_time }}</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Service Days</span>
+            <span class="value">{{ booking.driver_route.available_days }}</span>
+        </div>
+        {% if booking.driver.vehicle %}
+        <div class="contract-row">
+            <span class="label">Car</span>
+            <span class="value">
+                {{ booking.driver.vehicle.brand }} {{ booking.driver.vehicle.model }}
+                {{ booking.driver.vehicle.year }} — {{ booking.driver.vehicle.color }}
+            </span>
+        </div>
+        {% endif %}
+        <div class="contract-row">
+            <span class="label">Subscription</span>
+            <span class="value">{{ booking.subscription_months }} month{{ booking.subscription_months|pluralize }}</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Start Date</span>
+            <span class="value">{{ booking.start_date|date:"d M Y" }}</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">End Date</span>
+            <span class="value">{{ booking.end_date|date:"d M Y" }}</span>
+        </div>
+    </div>
+
+    {% if payment %}
+    <div class="dm-card mb-3">
+        <h5 style="font-weight:700; margin-bottom:12px;">Payment</h5>
+        <div class="contract-row">
+            <span class="label">Total Amount</span>
+            <span class="value" style="font-weight:700; font-size:18px;">{{ booking.total_price }} SAR</span>
+        </div>
+        <div class="contract-row">
+            <span class="label">Payment Status</span>
+            <span class="value">{{ payment.get_status_display }}</span>
+        </div>
+        {% if payment.paid_at %}
+        <div class="contract-row">
+            <span class="label">Paid On</span>
+            <span class="value">{{ payment.paid_at|date:"d M Y H:i" }}</span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="dm-card">
+        <h5 style="font-weight:700; margin-bottom:12px;">Actions</h5>
+        <div class="d-flex flex-wrap gap-2">
+            {% if contract %}
+            <a href="{% url 'bookings:contract_detail' contract.id %}" class="btn-dm-outline">View Contract</a>
+            {% endif %}
+            {% if booking.status == 'completed' and not has_rating %}
+            <a href="{% url 'bookings:rate_driver' booking.id %}" class="btn-dm-black">Rate Driver</a>
+            {% endif %}
+            <a href="{% url 'support:create_complaint' booking.id %}" class="btn-dm-outline">Submit Complaint</a>
+            <a href="{% url 'messaging:start_conversation' booking.driver.id %}?booking_id={{ booking.id }}" class="btn-dm-outline">Contact Driver</a>
+            <a href="{% url 'bookings:my_invoices' %}" class="btn-dm-outline">View Invoices</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

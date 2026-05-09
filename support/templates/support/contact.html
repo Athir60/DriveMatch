@@ -1,0 +1,384 @@
+{% extends 'main/base.html' %}
+{% block title %}Contact Us — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="dm-page-header">
+        <h2>Contact Us</h2>
+        <p>We are here to help. Send us a message and our team will get back to you.</p>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <!-- Contact Form -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="dm-card">
+                <h5 style="font-weight:700; margin-bottom:14px;">Support Info</h5>
+                <hr>
+                <div class="mb-3">
+                    <strong>Email</strong>
+                    <p style="font-size:13px; color:#666; margin:4px 0 0;">support@drivematch.com</p>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <strong>Phone</strong>
+                    <p style="font-size:13px; color:#666; margin:4px 0 0;">9200 12345</p>
+                    <p style="font-size:12px; color:#999; margin:2px 0 0;">Sun&ndash;Thu, 9am&ndash;6pm</p>
+                </div>
+                <hr>
+                <div>
+                    <strong>Response Time</strong>
+                    <p style="font-size:13px; color:#666; margin:4px 0 0;">Within 24 hours</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="dm-card">
+                <h5 style="font-weight:700; margin-bottom:16px;">Send a Message</h5>
+
+                {% if not request.user.is_authenticated %}
+                <div class="alert alert-warning mb-3" style="font-size:13px;">
+                    Please <a href="{% url 'accounts:sign_in' %}?next={{ request.path }}">sign in</a> to send a message.
+                </div>
+                {% else %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger mb-3">
+                    <strong>Please correct the errors below.</strong>
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" novalidate id="contactForm">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="dm-label">Topic</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.subject.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- حقول الشكوى المضافة - تظهر فقط عند اختيار Complaint -->
+                    <div id="complaintExtraFields" style="display:none; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee;" class="mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="dm-label">Complaint Against</label>
+                                <select name="complaint_against" id="complaintAgainst" class="form-select">
+                                    <option value="">Select...</option>
+                                    <option value="driver">Driver</option>
+                                    <option value="passenger">Passenger</option>
+                                    <option value="general">General</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="dm-label">Target ID (User/Driver ID)</label>
+                                <input type="text" name="target_id" id="targetId" class="form-control" placeholder="Enter ID">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="dm-label">Full Name</label>
+                            {{ form.full_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="dm-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="dm-label">Phone <span style="color:#999;">(optional)</span></label>
+                        {{ form.phone }}
+                    </div>
+
+                    <!-- Booking dropdown -->
+                    <div class="mb-3" id="bookingDropdownDiv" style="display:none;">
+                        <label class="dm-label">
+                            Related Booking
+                            <span class="text-danger" id="bookingRequiredStar">*</span>
+                        </label>
+                        {% if user_bookings %}
+                        <select name="related_booking_id" id="relatedBookingSelect" class="form-select mb-3">
+                            <option value="">Select a booking...</option>
+                            {% for booking in user_bookings %}
+                            <option value="{{ booking.id }}" 
+                                    data-route="{{ booking.driver_route.route.from_area }} &rarr; {{ booking.driver_route.route.to_area }}"
+                                    data-driver="{{ booking.driver_route.driver.user.get_full_name }}"
+                                    data-status="{{ booking.get_status_display }}">
+                                #{{ booking.id }} — {{ booking.driver_route.route.from_area }} &rarr; {{ booking.driver_route.route.to_area }}
+                                ({{ booking.get_status_display }} | {{ booking.created_at|date:"d M Y" }})
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <!-- بطاقة تفاصيل الحجز -->
+                        <div id="bookingDetailsCard" class="card shadow-sm p-3 mb-3" style="display:none; border-radius:12px; background-color:#fff; border: 1px solid #f0f0f0;">
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <span style="color:#888;">Booking ID</span>
+                                <span id="bookingId" style="font-weight:600;"></span>
+                            </div>
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <span style="color:#888;">Route</span>
+                                <span id="bookingRoute" style="font-weight:600;"></span>
+                            </div>
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <span style="color:#888;">Driver</span>
+                                <span id="bookingDriver" style="font-weight:600;"></span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2">
+                                <span style="color:#888;">Status</span>
+                                <span id="bookingStatus" style="font-weight:600;"></span>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <div class="dm-card-sm" style="background:#f9f9f9; font-size:13px; color:#666;">
+                            No bookings found. For booking-related complaints, please make a booking first.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="dm-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="dm-label">Attachment <span style="color:#999;">(optional)</span></label>
+                        {{ form.attachment }}
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-outline-secondary me-2 px-4" style="border-radius:8px;">Cancel</button>
+                        <button type="submit" class="btn btn-dark px-4" style="border-radius:8px; background-color: #111;">Submit Complaint</button>
+                    </div>
+                </form>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section (تم إعادتها كاملة 100%) -->
+    <div class="dm-card">
+        <h5 style="font-weight:700; margin-bottom:18px;">Frequently Asked Questions</h5>
+        <div id="faqAccordion">
+
+            {% for i, q, a in faq_items %}
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" style="background:none; border:none; width:100%; text-align:left; font-size:14px; font-weight:600; cursor:pointer; padding:0; display:flex; justify-content:space-between;"
+                        onclick="toggleFaq('{{ i }}')">
+                    <span>{{ i }}. {{ q }}</span>
+                    <span id="faq-icon-{{ i }}" style="flex-shrink:0; margin-left:12px;">+</span>
+                </button>
+                <div id="faq-{{ i }}" style="display:none; font-size:14px; color:#555; margin-top:8px; line-height:1.7;">
+                    {{ a }}
+                </div>
+            </div>
+            {% empty %}
+            {% for num, question, answer in faq_list %}
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" style="background:none; border:none; width:100%; text-align:left; font-size:14px; font-weight:600; cursor:pointer; padding:0; display:flex; justify-content:space-between;"
+                        onclick="toggleFaq('f{{ num }}')">
+                    <span>{{ num }}. {{ question }}</span>
+                    <span id="faq-icon-f{{ num }}" style="flex-shrink:0; margin-left:12px;">+</span>
+                </button>
+                <div id="faq-f{{ num }}" style="display:none; font-size:14px; color:#555; margin-top:8px; line-height:1.7;">
+                    {{ answer }}
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor %}
+
+            {# Hardcoded FAQ #}
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(1)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>1. How does the monthly driver subscription work?</span>
+                    <span id="faq-icon-1">+</span>
+                </button>
+                <div id="faq-1" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    You choose a verified driver for a fixed monthly route. Subscribe for 1&ndash;12 months, pay once, and your driver picks you up daily on the agreed schedule.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(2)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>2. Can I cancel after the subscription starts?</span>
+                    <span id="faq-icon-2">+</span>
+                </button>
+                <div id="faq-2" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    No. Once the subscription starts and payment is confirmed, passengers cannot cancel or request a refund.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(3)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>3. What happens if the driver cancels?</span>
+                    <span id="faq-icon-3">+</span>
+                </button>
+                <div id="faq-3" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    If the driver cannot continue the service, they must submit a cancellation request. If approved by admin, you receive a refund for the remaining unused days.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(4)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>4. What happens if the passenger does not show up?</span>
+                    <span id="faq-icon-4">+</span>
+                </button>
+                <div id="faq-4" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    If the passenger does not appear at the agreed time or location, no refund will be issued for that trip.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(5)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>5. How do I contact my driver?</span>
+                    <span id="faq-icon-5">+</span>
+                </button>
+                <div id="faq-5" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    Go to your booking, click "Contact Driver", and a conversation page will open. You can send messages and share your location.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(6)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>6. How do I submit a complaint?</span>
+                    <span id="faq-icon-6">+</span>
+                </button>
+                <div id="faq-6" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    Go to your booking detail page and click "Submit Complaint". Complaints require a valid booking reference.
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid #f0f0f0; padding:12px 0;">
+                <button type="button" onclick="toggleFaq(7)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>7. How do refunds work?</span>
+                    <span id="faq-icon-7">+</span>
+                </button>
+                <div id="faq-7" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    Refunds are only issued when a driver cancellation request is approved by admin. The refund covers the remaining unused days and is processed within 3&ndash;5 business days.
+                </div>
+            </div>
+
+            <div style="padding:12px 0;">
+                <button type="button" onclick="toggleFaq(8)" style="background:none;border:none;width:100%;text-align:left;font-size:14px;font-weight:600;cursor:pointer;padding:0;display:flex;justify-content:space-between;">
+                    <span>8. How can drivers receive their earnings?</span>
+                    <span id="faq-icon-8">+</span>
+                </button>
+                <div id="faq-8" style="display:none;font-size:14px;color:#555;margin-top:8px;line-height:1.7;">
+                    Drivers add their bank account (IBAN) during subscription setup or on the Earnings page. Payouts are processed monthly to the registered bank account.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script id="booking-logic-data" type="application/json">
+    {{ booking_required_subjects|safe }}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    var dataEl = document.getElementById('booking-logic-data');
+    var bookingRequiredSubjects = [];
+    try {
+        bookingRequiredSubjects = dataEl ? JSON.parse(dataEl.textContent) : [];
+    } catch(e) { console.error("Error parsing JSON data"); }
+
+    var subjectField = document.querySelector('[name="subject"]');
+    var bookingDiv = document.getElementById('bookingDropdownDiv');
+    var bookingSelect = document.getElementById('relatedBookingSelect');
+    var detailsCard = document.getElementById('bookingDetailsCard');
+    var complaintFields = document.getElementById('complaintExtraFields');
+
+    // تغيير اسم Driver Complaint إلى Complaint في الخيارات
+    if (subjectField) {
+        Array.from(subjectField.options).forEach(option => {
+            if (option.text.trim() === "Driver Complaint") {
+                option.text = "Complaint";
+            }
+        });
+    }
+
+    function checkBookingRequired() {
+        if (!subjectField || !bookingDiv) return;
+        var selectedText = subjectField.options[subjectField.selectedIndex].text.trim();
+        var val = subjectField.value.trim().toLowerCase();
+        
+        // إظهار حقول الشكوى الإضافية فقط عند اختيار Complaint
+        if (selectedText === "Complaint" || val.toLowerCase().includes('complaint')) {
+            if(complaintFields) complaintFields.style.display = 'block';
+        } else {
+            if(complaintFields) complaintFields.style.display = 'none';
+        }
+
+        // منطق إظهار حقل الحجز الأصلي
+        if (
+    selectedText === "Booking Issue" ||
+    selectedText === "Payment Issue" ||
+    selectedText === "Complaint"
+) {
+            bookingDiv.style.display = 'block';
+            updateBookingDetails();
+        } else {
+            bookingDiv.style.display = 'none';
+            if(detailsCard) detailsCard.style.display = 'none';
+        }
+    }
+
+    function updateBookingDetails() {
+        if (!bookingSelect || !detailsCard) return;
+        var selectedOption = bookingSelect.options[bookingSelect.selectedIndex];
+        var bookingId = bookingSelect.value;
+        if (bookingId && bookingId !== "") {
+            document.getElementById('bookingId').textContent = '#' + bookingId;
+            document.getElementById('bookingRoute').innerHTML = selectedOption.getAttribute('data-route');
+            document.getElementById('bookingDriver').textContent = selectedOption.getAttribute('data-driver');
+            document.getElementById('bookingStatus').textContent = selectedOption.getAttribute('data-status');
+            detailsCard.style.display = 'block';
+        } else {
+            detailsCard.style.display = 'none';
+        }
+    }
+
+    if (subjectField) {
+        subjectField.addEventListener('change', checkBookingRequired);
+        checkBookingRequired();
+    }
+    if (bookingSelect) {
+        bookingSelect.addEventListener('change', updateBookingDetails);
+    }
+})();
+
+function toggleFaq(n) {
+    var el = document.getElementById('faq-' + n);
+    var icon = document.getElementById('faq-icon-' + n);
+    if (!el || !icon) return;
+    if (el.style.display === 'none' || el.style.display === '') {
+        el.style.display = 'block';
+        icon.textContent = '-';
+    } else {
+        el.style.display = 'none';
+        icon.textContent = '+';
+    }
+}
+</script>
+{% endblock %}

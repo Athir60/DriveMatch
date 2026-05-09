@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+{% block title %}Complaints — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link active">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>Complaints</h2>
+            <p>View and manage customer complaints</p>
+        </div>
+
+        <!-- Status filter tabs -->
+        <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <span class="btn-dm-black" style="font-size:13px; padding:7px 16px; cursor:default;">
+                All ({{ complaints.paginator.count }})
+            </span>
+        </div>
+
+        {% for complaint in complaints %}
+        <div class="dm-card mb-3">
+            <div style="display:flex; gap:16px; align-items:flex-start;">
+                <div style="flex-shrink:0;">
+                    {% if complaint.status == 'new' %}
+                        <span class="badge-confirmed">New</span>
+                    {% elif complaint.status == 'in_progress' %}
+                        <span class="badge-pending">In Progress</span>
+                    {% elif complaint.status == 'resolved' %}
+                        <span class="badge-completed">Resolved</span>
+                    {% else %}
+                        <span class="badge-refunded">Closed</span>
+                    {% endif %}
+                </div>
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <strong style="font-size:15px;">{{ complaint.subject }}</strong>
+                            <span style="font-size:13px; color:#666; margin-left:8px;">#{{ complaint.id }}</span>
+                        </div>
+                        <span style="font-size:12px; color:#999;">{{ complaint.created_at|date:"d M Y · H:i" }}</span>
+                    </div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">
+                        Route: {{ complaint.booking.driver_route.route.from_area }} → {{ complaint.booking.driver_route.route.to_area }}
+                    </div>
+                    <p style="font-size:13px; color:#555; margin-top:6px; line-height:1.5;">
+                        {{ complaint.description|truncatechars:120 }}
+                    </p>
+                    {% if complaint.admin_response %}
+                    <div style="background:#f0f0f0; border-radius:6px; padding:10px; font-size:13px; margin-top:8px;">
+                        <strong>Admin Response:</strong> {{ complaint.admin_response }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="dm-card text-center py-5 text-muted">
+            <div style="font-size:40px; margin-bottom:12px;"><i class="fa-solid fa-circle-check"></i></div>
+            <h5>No complaints</h5>
+            <p>You currently have no complaints from passengers.</p>
+        </div>
+        {% endfor %}
+
+        {% if complaints.has_other_pages %}
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            {% if complaints.has_previous %}
+                <a href="?page={{ complaints.previous_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+            {% endif %}
+            <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+                {{ complaints.number }} / {{ complaints.paginator.num_pages }}
+            </span>
+            {% if complaints.has_next %}
+                <a href="?page={{ complaints.next_page_number }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dm-card-sm mt-4" style="font-size:13px; color:#666;">
+            ℹ New complaints are reviewed within 24 hours. You can contact support for urgent assistance if needed.
+        </div>
+    </div>
+</div>
+{% endblock %}

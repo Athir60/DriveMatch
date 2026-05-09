@@ -1,0 +1,157 @@
+{% extends 'main/base.html' %}
+{% block title %}Track Tickets — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+            <a href="{% url 'support:create_ticket' %}" class="btn-dm-black"
+               style="padding:7px 16px; font-size:13px;">+ New Ticket</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Track Tickets</h2>
+            <p>View and manage your support requests</p>
+        </div>
+
+        {% if ticket_error %}
+        <div class="alert alert-warning" style="font-size:13px;">{{ ticket_error }}</div>
+        {% endif %}
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- Search -->
+        <div class="dm-card mb-4">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="dm-label">Search</label>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Search by subject..."
+                           value="{{ search }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-dm-black w-100">Search</button>
+                </div>
+                {% if search %}
+                <div class="col-md-2">
+                    <a href="{% url 'drivers:driver_tickets' %}"
+                       class="btn-dm-outline w-100">Clear</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Tickets table -->
+        <div class="dm-card p-0">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td style="font-weight:600; font-size:13px;">{{ ticket.ticket_number }}</td>
+                        <td>
+                            <div style="font-weight:600; font-size:14px;">{{ ticket.subject }}</div>
+                            <div style="font-size:12px; color:#999;">
+                                {{ ticket.description|truncatechars:50 }}
+                            </div>
+                        </td>
+                        <td style="font-size:13px; color:#666;">{{ ticket.get_category_display }}</td>
+                        <td>
+                            {% if ticket.status == 'open' %}
+                                <span class="badge-confirmed">Open</span>
+                            {% elif ticket.status == 'in_progress' %}
+                                <span class="badge-active">In Progress</span>
+                            {% elif ticket.status == 'in_review' %}
+                                <span class="badge-pending">In Review</span>
+                            {% elif ticket.status == 'resolved' %}
+                                <span class="badge-completed">Resolved</span>
+                            {% else %}
+                                <span class="badge-refunded">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:13px; color:#666;">
+                            {{ ticket.created_at|date:"d M Y" }}<br>
+                            <span style="color:#999;">{{ ticket.created_at|date:"H:i" }}</span>
+                        </td>
+                        <td style="font-size:13px; color:#666;">
+                            {{ ticket.updated_at|date:"d M Y" }}<br>
+                            <span style="color:#999;">{{ ticket.updated_at|date:"H:i" }}</span>
+                        </td>
+                    </tr>
+                    {% if ticket.admin_response %}
+                    <tr>
+                        <td colspan="6" style="background:#e8f4fd; padding:10px 16px;">
+                            <strong style="font-size:13px;">Admin Response:</strong>
+                            <p style="font-size:13px; margin:4px 0 0; color:#333;">{{ ticket.admin_response }}</p>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No tickets found.
+                            <a href="{% url 'support:create_ticket' %}">Create your first ticket</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if tickets.has_other_pages %}
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            {% if tickets.has_previous %}
+                <a href="?page={{ tickets.previous_page_number }}&search={{ search }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+            {% endif %}
+            <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+                {{ tickets.number }} / {{ tickets.paginator.num_pages }}
+            </span>
+            {% if tickets.has_next %}
+                <a href="?page={{ tickets.next_page_number }}&search={{ search }}"
+                   class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dm-card-sm mt-4" style="background:#f9f9f9; font-size:13px; color:#666;">
+            Need help?
+            <a href="{% url 'support:contact' %}">Contact our support team</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

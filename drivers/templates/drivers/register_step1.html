@@ -1,0 +1,75 @@
+{% extends 'main/base.html' %}
+{% block title %}Register as Driver — Step 1{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-page-bg" style="padding:20px 16px;">
+
+    <!-- Top bar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto 24px;">
+        <a href="{% url 'main:landing' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="dm-pill-brand"><i class="fa-solid fa-car-side"></i> DriveMatch</div>
+        <span style="font-size:14px; color:#666;">Register as Driver</span>
+    </div>
+
+    <!-- Step progress -->
+    {% include 'drivers/_steps.html' with current_step=1 %}
+
+    <div style="max-width:700px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:24px;">
+            <p style="font-size:13px; color:#666; margin-bottom:4px;">Step 1 of 7</p>
+            <h3 style="font-weight:700; margin-bottom:6px;">Agree to Driver Agreement</h3>
+            <p style="font-size:14px; color:#666;">Please read and agree to the terms and conditions before continuing</p>
+        </div>
+
+        <div class="dm-card mb-4">
+            <h6 style="font-weight:700; margin-bottom:16px;">Driver Agreement</h6>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; padding-bottom:12px; border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:20px;"><i class="fa-solid fa-clock"></i></span>
+                    <span style="font-size:14px;">Commit to punctuality and respect the agreed schedules.</span>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:12px; padding-bottom:12px; border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:20px;"><i class="fa-solid fa-user"></i></span>
+                    <span style="font-size:14px;">Maintain good behavior and treat users with respect.</span>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:12px; padding-bottom:12px; border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:20px;">⊗</span>
+                    <span style="font-size:14px;">No sudden cancellations without a valid reason.</span>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:12px; padding-bottom:12px; border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:20px;"><i class="fa-solid fa-star"></i></span>
+                    <span style="font-size:14px;">Ensure high quality service and keep the vehicle clean.</span>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:12px;">
+                    <span style="font-size:20px;"><i class="fa-solid fa-chart-column"></i></span>
+                    <span style="font-size:14px;">Ratings and reviews affect your visibility on the platform.</span>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% for message in messages %}
+            <div class="alert {{ message.tags }} mb-3">{{ message }}</div>
+            {% endfor %}
+
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; justify-content:center;">
+                {{ form.agree }}
+                <label style="font-size:14px; margin:0;">I have read and agree to the terms and conditions</label>
+            </div>
+            {% if form.agree.errors %}
+            <div class="text-danger text-center" style="font-size:12px; margin-bottom:12px;">
+                {{ form.agree.errors.0 }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn-dm-black w-100" style="font-size:16px; padding:14px;">
+                Next
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

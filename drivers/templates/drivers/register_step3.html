@@ -1,0 +1,85 @@
+{% extends 'main/base.html' %}
+{% block title %}Register as Driver — Step 3{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-page-bg" style="padding:20px 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto 24px;">
+        <a href="{% url 'drivers:driver_register_step2' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="dm-pill-brand"><i class="fa-solid fa-car-side"></i> DriveMatch</div>
+        <span style="font-size:14px; color:#666;">Register as Driver</span>
+    </div>
+
+    {% include 'drivers/_steps.html' with current_step=3 %}
+
+    <div style="max-width:700px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:24px;">
+            <p style="font-size:13px; color:#666; margin-bottom:4px;">Step 3 of 7</p>
+            <h3 style="font-weight:700; margin-bottom:6px;">Car Information</h3>
+            <p style="font-size:14px; color:#666;">Please enter your vehicle details.</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger mb-3">
+            <strong>Please correct the errors below.</strong>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="dm-card mb-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="dm-label">Car Brand</label>
+                        {{ form.brand }}
+                        {% if form.brand.errors %}<div class="text-danger" style="font-size:12px;">{{ form.brand.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="dm-label">Car Model</label>
+                        {{ form.model }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="dm-label">Year</label>
+                        {{ form.year }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">Color</label>
+                        {{ form.color }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="dm-label">Car Type</label>
+                        {{ form.car_type }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="dm-label">License Plate Number</label>
+                    {{ form.license_plate }}
+                </div>
+                <div class="mb-3">
+                    <label class="dm-label">Car Photo</label>
+                    <div style="border:1px dashed #ccc; border-radius:8px; padding:24px; text-align:center; background:#fafafa;">
+                        <div style="font-size:28px; margin-bottom:8px;"><i class="fa-solid fa-car-side"></i></div>
+                        <p style="font-size:13px; color:#666; margin-bottom:10px;">Upload a clear photo of your car</p>
+                        {{ form.car_photo }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'drivers:driver_register_step2' %}" class="btn-dm-outline">Back</a>
+                <button type="submit" class="btn-dm-black" style="padding:10px 32px;">Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

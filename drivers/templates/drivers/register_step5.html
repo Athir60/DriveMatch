@@ -1,0 +1,130 @@
+{% extends 'main/base.html' %}
+{% block title %}Register as Driver — Step 5{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-page-bg" style="padding:20px 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:960px; margin:0 auto 24px;">
+        <a href="{% url 'drivers:driver_register_step4' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="dm-pill-brand"><i class="fa-solid fa-car-side"></i> DriveMatch</div>
+        <span style="font-size:14px; color:#666;">Register as Driver</span>
+    </div>
+
+    {% include 'drivers/_steps.html' with current_step=5 %}
+
+    <div style="max-width:960px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:24px;">
+            <p style="font-size:13px; color:#666; margin-bottom:4px;">Step 5 of 7</p>
+            <h3 style="font-weight:700; margin-bottom:6px;">Set Your Availability, Commitment &amp; Pricing</h3>
+            <p style="font-size:14px; color:#666;">Set your available days, working hours, commitment duration, and price for each route.</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% for route in selected_routes %}
+            <div class="dm-card mb-4">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h6 style="font-weight:700; margin:0;">
+                        Route: {{ route.from_area }} → {{ route.to_area }}
+                    </h6>
+                </div>
+
+                <!-- Available Days -->
+                <div class="mb-3">
+                    <label class="dm-label">Available Days</label>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+                        {% for day in days_choices %}
+                        <label style="cursor:pointer;">
+                            <input type="checkbox" name="route_{{ route.id }}_days"
+                                   value="{{ day }}" style="display:none;" class="day-cb">
+                            <span class="day-btn" style="display:inline-block; padding:8px 14px; border:1px solid #ccc;
+                                  border-radius:8px; font-size:13px; background:#fff; cursor:pointer;
+                                  transition:all 0.15s;">{{ day }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Working Hours + Commitment + Price -->
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="dm-label">Start Time</label>
+                        <select name="route_{{ route.id }}_start_time" class="form-select" required>
+                            <option value="">Select time</option>
+                            {% for h in time_choices %}
+                            <option value="{{ h }}">{{ h }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="dm-label">End Time</label>
+                        <select name="route_{{ route.id }}_end_time" class="form-select" required>
+                            <option value="">Select time</option>
+                            {% for h in time_choices %}
+                            <option value="{{ h }}">{{ h }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="dm-label">Commitment Duration</label>
+                        <select name="route_{{ route.id }}_commitment" class="form-select">
+                            {% for val, label in commitment_choices %}
+                            <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="dm-label">Monthly Price (SAR)</label>
+                        <input type="number" name="route_{{ route.id }}_price"
+                               class="form-control" placeholder="e.g. 800" min="1" required>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="dm-card text-center text-muted">
+                No routes selected. <a href="{% url 'drivers:driver_register_step4' %}">Go back and select routes</a>.
+            </div>
+            {% endfor %}
+
+            <!-- Info note -->
+            <div class="dm-card-sm mb-4" style="background:#f9f9f9; font-size:13px; color:#666;">
+                ℹ You can add multiple routes. Make sure the working hours do not overlap.
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'drivers:driver_register_step4' %}" class="btn-dm-outline">Back</a>
+                <button type="submit" class="btn-dm-black" style="padding:10px 32px;">Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle day button styles
+document.querySelectorAll('.day-cb').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        var span = this.nextElementSibling;
+        if (this.checked) {
+            span.style.background = '#111';
+            span.style.color = '#fff';
+            span.style.borderColor = '#111';
+        } else {
+            span.style.background = '#fff';
+            span.style.color = '#333';
+            span.style.borderColor = '#ccc';
+        }
+    });
+});
+</script>
+{% endblock %}

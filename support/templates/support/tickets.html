@@ -1,0 +1,148 @@
+{% extends 'main/base.html' %}
+{% block title %}My Tickets — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="dm-page-header" style="margin-bottom:0;">
+            <h2>Tickets</h2>
+            <p>View and manage your support requests</p>
+        </div>
+        <a href="{% url 'support:create_ticket' %}" class="btn-dm-black">+ New Ticket</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="dm-card mb-4">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="dm-label">Search</label>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search by ticket ID or subject"
+                       value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label class="dm-label">Ticket Type</label>
+                <select name="ticket_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for val, label in type_choices %}
+                        <option value="{{ val }}" {% if type_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="dm-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for val, label in status_choices %}
+                        <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-dm-black w-100">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ticket count -->
+    <p style="font-size:14px; color:#666; margin-bottom:12px;">
+        Showing {{ tickets.start_index }}–{{ tickets.end_index }} of {{ tickets.paginator.count }} tickets
+    </p>
+
+    <!-- Tickets table -->
+    <div class="dm-card p-0">
+        <table class="dm-table">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Last Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td style="font-weight:600; font-size:13px;">{{ ticket.ticket_number }}</td>
+                    <td>
+                        <span class="badge-pending" style="font-size:11px;">
+                            {{ ticket.get_ticket_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="font-weight:600; font-size:14px;">{{ ticket.subject }}</div>
+                        <div style="font-size:12px; color:#999;">{{ ticket.description|truncatechars:60 }}</div>
+                    </td>
+                    <td style="font-size:13px; color:#666;">{{ ticket.get_category_display }}</td>
+                    <td>
+                        {% if ticket.status == 'open' %}
+                            <span class="badge-confirmed">Open</span>
+                        {% elif ticket.status == 'in_progress' %}
+                            <span class="badge-active">In Progress</span>
+                        {% elif ticket.status == 'in_review' %}
+                            <span class="badge-pending">In Review</span>
+                        {% elif ticket.status == 'resolved' %}
+                            <span class="badge-completed">Resolved</span>
+                        {% else %}
+                            <span class="badge-refunded">Closed</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:13px; color:#666;">{{ ticket.created_at|date:"d M Y" }}<br>
+                        <span style="color:#999;">{{ ticket.created_at|date:"H:i" }}</span>
+                    </td>
+                    <td style="font-size:13px; color:#666;">{{ ticket.updated_at|date:"d M Y" }}<br>
+                        <span style="color:#999;">{{ ticket.updated_at|date:"H:i" }}</span>
+                    </td>
+                </tr>
+                {% if ticket.admin_response %}
+                <tr>
+                    <td colspan="7" style="background:#e8f4fd; border-bottom:1px solid #bee5eb; padding:10px 16px;">
+                        <strong style="font-size:12px; color:#0c5460;">Admin Response:</strong>
+                        <p style="font-size:13px; margin:4px 0 0; color:#333;">{{ ticket.admin_response }}</p>
+                    </td>
+                </tr>
+                {% endif %}
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        No tickets found.
+                        <a href="{% url 'support:create_ticket' %}">Create your first ticket</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if tickets.has_other_pages %}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        {% if tickets.has_previous %}
+            <a href="?page={{ tickets.previous_page_number }}&status={{ status_filter }}&ticket_type={{ type_filter }}&search={{ search }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Previous</a>
+        {% endif %}
+        <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+            Page {{ tickets.number }} of {{ tickets.paginator.num_pages }}
+        </span>
+        {% if tickets.has_next %}
+            <a href="?page={{ tickets.next_page_number }}&status={{ status_filter }}&ticket_type={{ type_filter }}&search={{ search }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Help note -->
+    <div class="dm-card-sm mt-4 d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Need help?</strong>
+            <span style="font-size:13px; color:#666; margin-left:8px;">Check our Help Center for answers to common questions.</span>
+        </div>
+        <a href="{% url 'support:contact' %}" class="btn-dm-outline" style="font-size:13px; padding:6px 14px;">Contact Us</a>
+    </div>
+
+</div>
+{% endblock %}

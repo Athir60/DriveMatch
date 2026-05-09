@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Database
+db.sqlite3
+
+# Environment variables
+.env
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Media files (keep only .gitkeep)
+media/*
+!media/.gitkeep
+
+# Static files
+staticfiles/
+static/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

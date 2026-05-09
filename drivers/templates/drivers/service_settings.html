@@ -1,0 +1,182 @@
+{% extends 'main/base.html' %}
+{% block title %}Service Settings — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Service Settings</h2>
+            <p>Manage your car information, routes, availability, and pricing</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- 1. Vehicle Information -->
+        <div class="dm-card mb-4">
+            <h5 style="font-weight:700; margin-bottom:16px;">Car Information</h5>
+
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Please correct the errors below.</strong>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="save_vehicle" value="1">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="dm-label">Car Brand</label>
+                        {{ vehicle_form.brand }}
+                        {% if vehicle_form.brand.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ vehicle_form.brand.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="dm-label">Car Model</label>
+                        {{ vehicle_form.model }}
+                        {% if vehicle_form.model.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ vehicle_form.model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Year</label>
+                        {{ vehicle_form.year }}
+                        {% if vehicle_form.year.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ vehicle_form.year.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Color</label>
+                        {{ vehicle_form.color }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="dm-label">Car Type</label>
+                        {{ vehicle_form.car_type }}
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="dm-label">License Plate</label>
+                        {{ vehicle_form.license_plate }}
+                        {% if vehicle_form.license_plate.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ vehicle_form.license_plate.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="dm-label">Car Photo</label>
+                        {{ vehicle_form.car_photo }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-dm-black">Save Car Information</button>
+            </form>
+        </div>
+
+        <!-- 2. My Routes -->
+        <div class="dm-card mb-4">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h5 style="font-weight:700; margin:0;">My Routes</h5>
+                <a href="{% url 'drivers:add_driver_route' %}" class="btn-dm-black"
+                   style="font-size:13px; padding:7px 16px;">+ Add Route</a>
+            </div>
+
+            {% if driver_routes %}
+            <div class="dm-card p-0">
+                <table class="dm-table">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>Days</th>
+                            <th>Time</th>
+                            <th>Price</th>
+                            <th>Commitment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dr in driver_routes %}
+                        <tr>
+                            <td style="font-weight:600; font-size:13px;">
+                                {{ dr.route.from_area }} &rarr; {{ dr.route.to_area }}
+                            </td>
+                            <td style="font-size:12px; color:#666;">{{ dr.available_days }}</td>
+                            <td style="font-size:12px; color:#666;">
+                                {{ dr.start_time }} &ndash; {{ dr.end_time }}
+                            </td>
+                            <td style="font-weight:600;">{{ dr.monthly_price }} SAR</td>
+                            <td style="font-size:13px; color:#666;">
+                                {{ dr.get_commitment_duration_display }}
+                            </td>
+                            <td>
+                                {% if dr.is_active %}
+                                <span class="badge-active" style="font-size:11px;">Active</span>
+                                {% else %}
+                                <span class="badge-completed" style="font-size:11px;">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:6px;">
+                                    <a href="{% url 'drivers:edit_driver_route' dr.id %}"
+                                       class="btn-dm-outline" style="font-size:12px; padding:4px 10px;">
+                                        Edit
+                                    </a>
+                                    {% if dr.is_active %}
+                                    <form method="POST"
+                                          action="{% url 'drivers:deactivate_driver_route' dr.id %}"
+                                          style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn-dm-outline"
+                                                style="font-size:12px; padding:4px 10px; color:#dc3545; border-color:#dc3545;"
+                                                onclick="return confirm('Deactivate this route?')">
+                                            Deactivate
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="dm-card-sm" style="text-align:center; color:#999; padding:24px;">
+                No routes added yet.
+                <a href="{% url 'drivers:add_driver_route' %}">Add your first route</a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

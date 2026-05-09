@@ -1,0 +1,98 @@
+{% extends 'main/base.html' %}
+{% block title %}Account Pending — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh; background:#f5f5f5; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:560px;">
+
+        <!-- DriveMatch header -->
+        <div class="text-center mb-4">
+            <a href="{% url 'main:landing' %}"
+               style="font-size:22px; font-weight:700; color:#111; text-decoration:none;">DriveMatch</a>
+        </div>
+
+        <div class="dm-card text-center">
+            <div style="font-size:52px; margin-bottom:16px;">⏳</div>
+            <h3 style="font-weight:700; margin-bottom:8px;">Account Pending Approval</h3>
+            <p style="font-size:15px; color:#555; line-height:1.7; margin-bottom:24px;">
+                Your account is pending admin approval.<br>
+                You cannot receive booking requests until your identity and vehicle are verified.
+            </p>
+
+            <!-- Current status summary -->
+            <div class="dm-card" style="background:#f9f9f9; text-align:left; margin-bottom:24px;">
+                <div class="contract-row">
+                    <span class="label">Account Name</span>
+                    <span class="value">{{ driver_profile.user.get_full_name|default:driver_profile.user.username }}</span>
+                </div>
+                <div class="contract-row">
+                    <span class="label">Registration Email</span>
+                    <span class="value">{{ driver_profile.user.email }}</span>
+                </div>
+                <div class="contract-row">
+                    <span class="label">Verification Status</span>
+                    <span class="value">
+                        {% if driver_profile.verification_status == 'pending' %}
+                            <span class="badge-pending">Pending Review</span>
+                        {% elif driver_profile.verification_status == 'rejected' %}
+                            <span class="badge-cancelled">Rejected</span>
+                        {% else %}
+                            <span class="badge-active">Approved</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="contract-row">
+                    <span class="label">Identity Documents</span>
+                    <span class="value">
+                        {% if driver_profile.id_front and driver_profile.id_back and driver_profile.driver_license %}
+                            Submitted — Pending Review
+                        {% else %}
+                            Incomplete
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="contract-row">
+                    <span class="label">Vehicle</span>
+                    <span class="value">
+                        {% if driver_profile.vehicle %}
+                            Submitted — Pending Review
+                        {% else %}
+                            Not Submitted
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            {% if driver_profile.verification_status == 'rejected' %}
+            <div class="alert alert-danger mb-3" style="font-size:14px; text-align:left;">
+                <strong>Your application was rejected.</strong><br>
+                Please contact our support team to understand what needs to be corrected.
+            </div>
+            {% endif %}
+
+            <!-- What happens next -->
+            <div class="dm-card-sm mb-4" style="background:#f0f7ff; border:1px solid #b6d4fe; text-align:left; font-size:13px;">
+                <strong>ℹ What happens next?</strong>
+                <ul style="margin:8px 0 0; padding-left:18px; color:#444; line-height:1.8;">
+                    <li>Our team reviews your submitted documents.</li>
+                    <li>This usually takes 1–2 business days.</li>
+                    <li>Once approved, you will be able to receive booking requests.</li>
+                    <li>You can contact support if you have not heard back after 2 days.</li>
+                </ul>
+            </div>
+
+            <div class="d-flex flex-column gap-2">
+                <a href="{% url 'support:contact' %}" class="btn-dm-outline">
+                    Contact Support
+                </a>
+                <a href="{% url 'accounts:sign_out' %}" class="btn-dm-black" style="background:#666;">
+                    Sign Out
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

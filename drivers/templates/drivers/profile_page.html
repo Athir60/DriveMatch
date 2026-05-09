@@ -1,0 +1,240 @@
+{% extends 'main/base.html' %}
+{% block title %}Profile — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>Profile</h2>
+            <p>View and edit your account and vehicle information</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- Profile Photo + Personal Information -->
+        <div class="dm-card mb-4">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    {% if driver_profile.profile_photo %}
+                    <img src="{{ driver_profile.profile_photo.url }}"
+                         alt="Profile Photo"
+                         style="width:72px; height:72px; border-radius:50%; border:2px solid #e0e0e0;
+                                object-fit:cover;">
+                    {% else %}
+                    <div style="width:72px; height:72px; background:#f0f0f0; border-radius:50%;
+                                border:2px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:20px; font-weight:700; color:#aaa;">
+                        {{ driver_profile.user.first_name|first|upper }}{{ driver_profile.user.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <h5 style="font-weight:700; margin:0;">Personal Information</h5>
+                </div>
+                <a href="{% url 'drivers:driver_settings' %}" class="btn-dm-outline"
+                   style="font-size:13px; padding:5px 14px;">Edit</a>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="dm-label">Full Name</label>
+                    <input type="text" class="form-control"
+                           value="{{ driver_profile.user.get_full_name|default:driver_profile.user.username }}"
+                           disabled>
+                </div>
+                <div class="col-md-6">
+                    <label class="dm-label">Email Address</label>
+                    <input type="email" class="form-control"
+                           value="{{ driver_profile.user.email }}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label class="dm-label">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text">+966</span>
+                        <input type="text" class="form-control"
+                               value="{{ driver_profile.phone_number }}" disabled>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="dm-label">National ID / Iqama Number</label>
+                    <input type="text" class="form-control"
+                           value="{{ driver_profile.national_id|default:'—' }}" disabled>
+                </div>
+            </div>
+
+            <!-- Verification status badge -->
+            <div class="mt-3 pt-3" style="border-top:1px solid #f0f0f0;">
+                <label class="dm-label">Verification Status</label>
+                <div style="margin-top:4px;">
+                    {% if driver_profile.verification_status == 'approved' %}
+                        <span class="badge-active" style="font-size:13px; padding:5px 14px;"><i class="fa-solid fa-circle-check"></i> Approved</span>
+                    {% elif driver_profile.verification_status == 'pending' %}
+                        <span class="badge-pending" style="font-size:13px; padding:5px 14px;">⏳ Pending Review</span>
+                    {% else %}
+                        <span class="badge-cancelled" style="font-size:13px; padding:5px 14px;"><i class="fa-solid fa-circle-xmark"></i> Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <div class="dm-card mb-4">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h5 style="font-weight:700; margin:0;">Vehicle Information</h5>
+                <a href="{% url 'drivers:driver_settings' %}" class="btn-dm-outline"
+                   style="font-size:13px; padding:5px 14px;">Edit</a>
+            </div>
+            {% if vehicle %}
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="dm-label">Car Brand</label>
+                    <input type="text" class="form-control" value="{{ vehicle.brand }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label class="dm-label">Car Model</label>
+                    <input type="text" class="form-control" value="{{ vehicle.model }}" disabled>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Year</label>
+                    <input type="text" class="form-control" value="{{ vehicle.year }}" disabled>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Color</label>
+                    <input type="text" class="form-control" value="{{ vehicle.color }}" disabled>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Type</label>
+                    <input type="text" class="form-control"
+                           value="{{ vehicle.get_car_type_display }}" disabled>
+                </div>
+                <div class="col-md-4">
+                    <label class="dm-label">License Plate</label>
+                    <input type="text" class="form-control" value="{{ vehicle.license_plate }}" disabled>
+                </div>
+                {% if vehicle.car_photo %}
+                <div class="col-md-8">
+                    <label class="dm-label">Car Photo</label>
+                    <div style="border:1px solid #e0e0e0; border-radius:8px; padding:10px; background:#fafafa;">
+                        <img src="{{ vehicle.car_photo.url }}" alt="Car photo"
+                             style="max-height:120px; border-radius:6px;">
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="dm-card-sm" style="background:#f9f9f9; font-size:13px; color:#999;">
+                        No car photo uploaded.
+                        <a href="{% url 'drivers:driver_settings' %}">Upload one in Settings</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="text-muted" style="font-size:14px;">
+                No vehicle registered yet.
+                <a href="{% url 'drivers:driver_settings' %}">Add vehicle in Settings</a>
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Verification Documents -->
+        <div class="dm-card mb-4">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h5 style="font-weight:700; margin:0;">Verification Documents</h5>
+                <a href="{% url 'drivers:driver_settings' %}" class="btn-dm-outline"
+                   style="font-size:13px; padding:5px 14px;">Add / Update</a>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="dm-card-sm" style="text-align:center; background:#f9f9f9;">
+                        <div style="font-size:20px; margin-bottom:6px;"><i class="fa-solid fa-id-card"></i></div>
+                        <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                            ID / Iqama (Front)
+                        </div>
+                        {% if driver_profile.id_front %}
+                            <span class="badge-active" style="font-size:11px;">Uploaded</span>
+                        {% else %}
+                            <span class="badge-pending" style="font-size:11px;">Not Uploaded</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dm-card-sm" style="text-align:center; background:#f9f9f9;">
+                        <div style="font-size:20px; margin-bottom:6px;"><i class="fa-solid fa-id-card"></i></div>
+                        <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                            ID / Iqama (Back)
+                        </div>
+                        {% if driver_profile.id_back %}
+                            <span class="badge-active" style="font-size:11px;">Uploaded</span>
+                        {% else %}
+                            <span class="badge-pending" style="font-size:11px;">Not Uploaded</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dm-card-sm" style="text-align:center; background:#f9f9f9;">
+                        <div style="font-size:20px; margin-bottom:6px;"><i class="fa-solid fa-file-lines"></i></div>
+                        <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                            Driver License
+                        </div>
+                        {% if driver_profile.driver_license %}
+                            <span class="badge-active" style="font-size:11px;">Uploaded</span>
+                        {% else %}
+                            <span class="badge-pending" style="font-size:11px;">Not Uploaded</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="dm-card mb-4">
+            <h5 style="font-weight:700; margin-bottom:12px;">Account Actions</h5>
+            <div class="d-flex justify-content-between align-items-center py-2"
+                 style="border-bottom:1px solid #f0f0f0;">
+                <div>
+                    <strong>Log Out</strong>
+                    <div style="font-size:13px; color:#999;">Sign out from your account on this device</div>
+                </div>
+                <a href="{% url 'accounts:sign_out' %}" class="btn-dm-outline">Log Out</a>
+            </div>
+            <div class="d-flex justify-content-between align-items-center py-2 mt-2">
+                <div>
+                    <strong style="color:#dc3545;">Delete Account</strong>
+                    <div style="font-size:13px; color:#999;">
+                        Permanently delete your account and all data
+                    </div>
+                </div>
+                <!-- Placeholder only — no real delete implemented -->
+                <button class="btn-dm-outline" style="color:#dc3545; border-color:#dc3545;"
+                        onclick="alert('Please contact support to delete your account.')">
+                    Delete Account
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

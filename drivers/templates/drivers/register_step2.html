@@ -1,0 +1,229 @@
+{% extends 'main/base.html' %}
+{% block title %}Register as Driver — Step 2{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-page-bg" style="padding:20px 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto 24px;">
+        <a href="{% url 'drivers:driver_register_step1' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div style="font-size:18px; font-weight:700; border:1px solid #ccc; border-radius:8px;
+                    padding:6px 20px; background:#fff;">DriveMatch</div>
+        <span style="font-size:14px; color:#666;">Register as Driver</span>
+    </div>
+
+    {% include 'drivers/_steps.html' with current_step=2 %}
+
+    <div style="max-width:760px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:24px;">
+            <p style="font-size:13px; color:#666; margin-bottom:4px;">Step 2 of 7</p>
+            <h3 style="font-weight:700; margin-bottom:6px;">Personal Information</h3>
+            <p style="font-size:14px; color:#666;">
+                Please enter your personal information and verify your contact details.
+            </p>
+        </div>
+
+        <!-- General error banner -->
+        {% if form.errors %}
+        <div class="alert alert-danger" style="font-size:13px; max-width:760px; margin:0 auto 16px;">
+            Please correct the errors below. Password and file uploads must be re-entered
+            after an error for security reasons.
+        </div>
+        {% endif %}
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="dm-card mb-3">
+
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label class="dm-label">Full Name</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.full_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label class="dm-label">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label class="dm-label">Phone Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text">+966</span>
+                            {{ form.phone_number }}
+                        </div>
+                        {% if form.phone_number.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- National ID -->
+                <div class="mb-3">
+                    <label class="dm-label">National ID / Iqama Number</label>
+                    {{ form.national_id }}
+                    {% if form.national_id.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.national_id.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+            
+
+                <!-- Password -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="dm-label">Password</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.password.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="dm-label">Confirm Password</label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.confirm_password.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2" style="font-size:13px; margin-bottom:12px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+
+                <!-- Password requirements box -->
+                <div class="dm-card-sm mb-3" style="background:#f9f9f9; font-size:13px;">
+                    <strong>ℹ Password Requirements</strong>
+                    <ul style="margin:6px 0 0; padding-left:18px;">
+                        <li>At least 8 characters long</li>
+                        <li>At least one uppercase letter (e.g. A, B, C)</li>
+                        <li>At least one number (e.g. 1, 2, 3)</li>
+                    </ul>
+                    <div style="margin-top:6px; color:#666;">
+                        Valid example: <strong>Ahmed123</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Documents Section -->
+<div class="dm-card mb-4">
+    <h6 style="font-weight:700; margin-bottom:16px;">Required Documents</h6>
+    <p style="font-size:13px; color:#666; margin-bottom:16px;">
+        ℹ All documents will be reviewed by our team before your account is approved.
+        All four documents are required.
+    </p>
+
+    <div class="row g-3">
+
+        <!-- ID Front -->
+        <div class="col-md-3">
+            <div style="border:1px dashed #ccc; border-radius:8px; padding:16px;
+                        text-align:center; background:#fafafa;">
+                <div style="font-size:22px; margin-bottom:8px;"><i class="fa-solid fa-id-card"></i></div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                    ID / Iqama (Front)
+                </div>
+                <div style="font-size:11px; color:#999; margin-bottom:10px;">
+                    Upload a clear photo
+                </div>
+                {{ form.id_front }}
+                {% if form.id_front.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:4px;">
+                    {{ form.id_front.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ID Back -->
+        <div class="col-md-3">
+            <div style="border:1px dashed #ccc; border-radius:8px; padding:16px;
+                        text-align:center; background:#fafafa;">
+                <div style="font-size:22px; margin-bottom:8px;"><i class="fa-solid fa-id-card"></i></div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                    ID / Iqama (Back)
+                </div>
+                <div style="font-size:11px; color:#999; margin-bottom:10px;">
+                    Upload a clear photo
+                </div>
+                {{ form.id_back }}
+                {% if form.id_back.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:4px;">
+                    {{ form.id_back.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Driver License -->
+        <div class="col-md-3">
+            <div style="border:1px dashed #ccc; border-radius:8px; padding:16px;
+                        text-align:center; background:#fafafa;">
+                <div style="font-size:22px; margin-bottom:8px;"><i class="fa-solid fa-file-lines"></i></div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                    Driver License
+                </div>
+                <div style="font-size:11px; color:#999; margin-bottom:10px;">
+                    Upload a clear photo
+                </div>
+                {{ form.driver_license }}
+                {% if form.driver_license.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:4px;">
+                    {{ form.driver_license.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Profile Photo (Required) -->
+        <div class="col-md-3">
+            <div style="border:1px dashed #ccc; border-radius:8px; padding:16px;
+                        text-align:center; background:#fafafa;">
+                <div style="font-size:22px; margin-bottom:8px;"><i class="fa-solid fa-user"></i></div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">
+                    Profile Photo
+                </div>
+                <div style="font-size:11px; color:#999; margin-bottom:10px;">
+                    Upload a clear photo
+                </div>
+                {{ form.profile_photo }}
+                {% if form.profile_photo.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:4px;">
+                    {{ form.profile_photo.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'drivers:driver_register_step1' %}" class="btn-dm-outline">Back</a>
+                <button type="submit" class="btn-dm-black" style="padding:10px 32px;">Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

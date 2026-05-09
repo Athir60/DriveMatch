@@ -1,0 +1,218 @@
+{% extends 'main/base.html' %}
+{% block title %}More — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div class="dm-page-header">
+            <h2>More</h2>
+            <p>Manage your account and app settings</p>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <div style="max-width:640px;">
+
+            <!-- Profile -->
+            <a href="{% url 'drivers:driver_profile_page' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px;
+                     cursor:pointer; transition:box-shadow 0.15s;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        P
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Profile</div>
+                        <div style="font-size:13px; color:#666;">
+                            View and edit your personal information and account details
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Messages -->
+            <a href="{% url 'messaging:driver_threads' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        M
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Messages</div>
+                        <div style="font-size:13px; color:#666;">
+                            View your conversations and messages
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Track Tickets -->
+            <a href="{% url 'drivers:driver_tickets' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        TK
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Track Tickets</div>
+                        <div style="font-size:13px; color:#666;">
+                            Track and manage your support tickets and requests
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- My Subscription -->
+            <a href="{% url 'drivers:driver_subscription' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        SB
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">My Subscription</div>
+                        <div style="font-size:13px; color:#666;">
+                            View and manage your current platform subscription
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Invoices -->
+            <a href="{% url 'drivers:driver_invoices' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        INV
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Invoices</div>
+                        <div style="font-size:13px; color:#666;">
+                            View and download your invoices and payment history
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Service Settings -->
+            <a href="{% url 'drivers:service_settings' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        SS
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Service Settings</div>
+                        <div style="font-size:13px; color:#666;">
+                            Manage your car, routes, availability, and pricing
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Contact Support -->
+            <a href="{% url 'support:contact' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        CS
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Contact Support</div>
+                        <div style="font-size:13px; color:#666;">
+                            Get help from our support team for any issue
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+            <!-- Privacy Policy -->
+            <a href="{% url 'drivers:driver_privacy' %}"
+               style="text-decoration:none; color:inherit; display:block;">
+                <div class="dm-card mb-2" style="display:flex; align-items:center; gap:16px; cursor:pointer;"
+                     onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+                     onmouseout="this.style.boxShadow=''">
+                    <div style="width:52px; height:52px; background:#f0f0f0; border-radius:10px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:13px; font-weight:700;
+                                color:#666; flex-shrink:0;">
+                        PR
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:2px;">Privacy Policy</div>
+                        <div style="font-size:13px; color:#666;">
+                            Read our privacy policy and learn how we protect your data
+                        </div>
+                    </div>
+                    <span style="font-size:18px; color:#999;">&rsaquo;</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

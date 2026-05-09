@@ -1,0 +1,72 @@
+{% extends 'main/base.html' %}
+{% block title %}Messages — DriveMatch{% endblock %}
+{% block nav_more %}active{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:680px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'main:passenger_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        <div class="dm-page-header" style="margin:0; text-align:right;">
+            <h2 style="margin:0;">Messages</h2>
+        </div>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    {% if threads %}
+    <div class="dm-card p-0">
+        {% for thread in threads %}
+        <a href="{% url 'messaging:conversation' thread.id %}"
+           style="text-decoration:none; color:inherit; display:block;
+                  border-bottom:1px solid #f0f0f0;">
+            <div style="padding:14px 18px; display:flex; gap:14px; align-items:center;">
+                <!-- Driver initials -->
+                <div style="width:44px; height:44px; background:#f0f0f0; border-radius:50%;
+                            border:1px solid #e0e0e0; display:flex; align-items:center;
+                            justify-content:center; font-weight:700; font-size:14px;
+                            color:#666; flex-shrink:0;">
+                    {{ thread.driver.user.first_name|first|upper }}{{ thread.driver.user.last_name|first|upper }}
+                </div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:700; font-size:14px; margin-bottom:2px;">
+                        {{ thread.driver.user.get_full_name|default:thread.driver.user.username }}
+                    </div>
+                    {% with last=thread.last_message %}
+                    {% if last %}
+                    <div style="font-size:12px; color:#999; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        {% if last.is_location %}
+                            Shared a location
+                        {% else %}
+                            {{ last.text|truncatechars:50 }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                <div style="font-size:11px; color:#999; flex-shrink:0;">
+                    {{ thread.updated_at|date:"d M" }}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="dm-card text-center" style="padding:40px;">
+        <div style="font-size:13px; color:#666; margin-bottom:8px;">
+            No conversations yet.
+        </div>
+        <p style="font-size:13px; color:#999;">
+            Start a conversation from a driver's profile page.
+        </p>
+        <a href="{% url 'drivers:search_drivers' %}" class="btn-dm-black" style="margin-top:8px;">
+            Find a Driver
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

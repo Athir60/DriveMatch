@@ -1,0 +1,119 @@
+{% extends 'main/base.html' %}
+{% block title %}My Bookings — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="dm-page-header">
+        <h2>My Bookings</h2>
+        <p>View and manage your current and past bookings.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="dm-card mb-4">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="dm-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for val, label in visible_status_choices %}
+                        <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn-dm-black w-100">Filter</button>
+            </div>
+            {% if status_filter %}
+            <div class="col-md-2">
+                <a href="{% url 'bookings:my_bookings' %}" class="btn-dm-outline w-100">Clear</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <div style="border-bottom:1px solid #e0e0e0; margin-bottom:16px;">
+        <a href="{% url 'bookings:my_bookings' %}" style="display:inline-block; padding:10px 16px; font-size:14px;
+           {% if not status_filter %}border-bottom:2px solid #111; font-weight:700;{% else %}color:#666;{% endif %}
+           text-decoration:none;">All</a>
+        <a href="?status=confirmed" style="display:inline-block; padding:10px 16px; font-size:14px;
+           {% if status_filter == 'confirmed' %}border-bottom:2px solid #111; font-weight:700;{% else %}color:#666;{% endif %}
+           text-decoration:none;">Upcoming</a>
+        <a href="?status=active" style="display:inline-block; padding:10px 16px; font-size:14px;
+           {% if status_filter == 'active' %}border-bottom:2px solid #111; font-weight:700;{% else %}color:#666;{% endif %}
+           text-decoration:none;">Active</a>
+        <a href="?status=completed" style="display:inline-block; padding:10px 16px; font-size:14px;
+           {% if status_filter == 'completed' %}border-bottom:2px solid #111; font-weight:700;{% else %}color:#666;{% endif %}
+           text-decoration:none;">Completed</a>
+    </div>
+
+    <p style="font-size:14px; color:#666; margin-bottom:12px;">
+        Showing {{ bookings.paginator.count }} booking{{ bookings.paginator.count|pluralize }}
+    </p>
+
+    <div class="dm-card p-0">
+        <table class="dm-table">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;">
+                            {{ booking.driver_route.route.from_area }} → {{ booking.driver_route.route.to_area }}
+                        </div>
+                        <div style="font-size:12px; color:#999;">
+                            {{ booking.subscription_months }} month{{ booking.subscription_months|pluralize }}
+                        </div>
+                    </td>
+                    <td style="font-size:13px;">
+                        {{ booking.start_date|date:"d M Y" }}<br>
+                        <span style="color:#999; font-size:12px;">{{ booking.driver_route.start_time }}</span>
+                    </td>
+                    <td style="font-size:13px;">
+                        {{ booking.end_date|date:"d M Y" }}<br>
+                        <span style="color:#999; font-size:12px;">{{ booking.driver_route.end_time }}</span>
+                    </td>
+                    <td>
+                        <span class="badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'bookings:booking_detail' booking.id %}"
+                           class="btn-dm-outline" style="font-size:12px; padding:5px 12px;">View Details</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        No bookings found. <a href="{% url 'drivers:search_drivers' %}">Find a driver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if bookings.has_other_pages %}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        {% if bookings.has_previous %}
+            <a href="?page={{ bookings.previous_page_number }}&status={{ status_filter }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Previous</a>
+        {% endif %}
+        <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+            {{ bookings.number }} / {{ bookings.paginator.num_pages }}
+        </span>
+        {% if bookings.has_next %}
+            <a href="?page={{ bookings.next_page_number }}&status={{ status_filter }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

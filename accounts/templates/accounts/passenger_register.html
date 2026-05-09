@@ -1,0 +1,151 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Create Account — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-auth-page">
+    <div class="dm-auth-shell" style="max-width:520px;">
+
+        <!-- Step indicator -->
+        <div class="dm-steps mb-4">
+            <div class="dm-step">
+                <div class="dm-step-circle active">1</div>
+                <div class="dm-step-label active">Account Info</div>
+            </div>
+            <div class="dm-step-line"></div>
+            <div class="dm-step">
+                <div class="dm-step-circle">2</div>
+                <div class="dm-step-label">Verification</div>
+            </div>
+            <div class="dm-step-line"></div>
+            <div class="dm-step">
+                <div class="dm-step-circle">3</div>
+                <div class="dm-step-label">Complete</div>
+            </div>
+        </div>
+
+        <div class="dm-auth-box">
+            <a href="{% url 'main:landing' %}" class="dm-back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <div class="dm-auth-brand">
+                <span class="mark"><i class="fa-solid fa-car-side"></i></span>
+                <span class="name">DriveMatch</span>
+            </div>
+
+            <h2>Create Your Account</h2>
+            <p class="subtitle">Join us and start your journey today</p>
+
+            <!-- General error banner -->
+            {% if form.errors %}
+            <div class="alert alert-danger" style="font-size:13px;">
+                Please fix the highlighted errors below.
+            </div>
+            {% endif %}
+
+            {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <!-- Full Name + Email -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="dm-label">Full Name</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.full_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="dm-label">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-danger" style="font-size:12px;">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label class="dm-label">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text">+966</span>
+                        {{ form.phone_number }}
+                    </div>
+                    {% if form.phone_number.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.phone_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="dm-label">Password</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label class="dm-label">Confirm Password</label>
+                    {{ form.confirm_password }}
+                    {% if form.confirm_password.errors %}
+                    <div class="text-danger" style="font-size:12px;">{{ form.confirm_password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Non-field errors (e.g. passwords don't match) -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2" style="font-size:13px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+
+                <!-- Password requirements box -->
+                <div class="dm-card-sm mb-3" style="background:#f9f9f9; font-size:13px;">
+                    <strong>ℹ Password Requirements</strong>
+                    <ul style="margin:6px 0 0; padding-left:18px;">
+                        <li>At least 8 characters long</li>
+                        <li>At least one uppercase letter (e.g. A, B, C)</li>
+                        <li>At least one number (e.g. 1, 2, 3)</li>
+                    </ul>
+                    <div style="margin-top:6px; color:#666;">
+                        Valid example: <strong>Ahmed123</strong>
+                    </div>
+                </div>
+
+                <!-- Agree terms -->
+                <div class="mb-3 d-flex align-items-center gap-2">
+                    {{ form.agree_terms }}
+                    <label style="font-size:14px; margin:0;">
+    I agree to the
+    <a href="{% url 'main:terms' %}">Terms of Service</a> and
+    <a href="{% url 'main:privacy' %}">Privacy Policy</a>
+</label>
+                </div>
+                {% if form.agree_terms.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:-8px; margin-bottom:10px;">
+                    {{ form.agree_terms.errors.0 }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-dm-black w-100 mt-1">Create Account</button>
+            </form>
+
+            <p class="text-center mt-3" style="font-size:14px;">
+                Already have an account? <a href="{% url 'accounts:sign_in' %}">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'main/base.html' %}
+{% block title %}Careers — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:760px;">
+
+    <div class="dm-page-header text-center mb-5">
+        <h1 style="font-weight:800; margin-bottom:10px;">Join the DriveMatch Team</h1>
+        <p style="font-size:16px; color:#666;">
+            Help us connect passengers with reliable drivers across Saudi Arabia.
+        </p>
+    </div>
+
+    <div class="dm-card mb-4">
+        <h4 style="font-weight:700; margin-bottom:12px;">About the Opportunity</h4>
+        <p style="font-size:15px; color:#444; line-height:1.7; margin:0;">
+            DriveMatch is a growing platform based in Riyadh. We are looking for motivated
+            individuals who share our passion for improving daily commutes and building
+            reliable transportation solutions for passengers and drivers alike.
+        </p>
+    </div>
+
+    <div class="dm-card mb-4">
+        <h4 style="font-weight:700; margin-bottom:16px;">Current Openings</h4>
+        <div class="dm-card-sm mb-3">
+            <div style="font-weight:700; font-size:15px; margin-bottom:4px;">Operations Coordinator</div>
+            <div style="font-size:13px; color:#666; margin-bottom:4px;">Full-time — Riyadh</div>
+            <p style="font-size:14px; color:#444; margin:0;">
+                Help manage driver onboarding, verify documents, and coordinate with passengers.
+            </p>
+        </div>
+        <div class="dm-card-sm mb-3">
+            <div style="font-weight:700; font-size:15px; margin-bottom:4px;">Customer Support Specialist</div>
+            <div style="font-size:13px; color:#666; margin-bottom:4px;">Full-time — Riyadh</div>
+            <p style="font-size:14px; color:#444; margin:0;">
+                Handle passenger and driver support tickets, resolve disputes, and ensure satisfaction.
+            </p>
+        </div>
+        <div class="dm-card-sm">
+            <div style="font-weight:700; font-size:15px; margin-bottom:4px;">Software Developer</div>
+            <div style="font-size:13px; color:#666; margin-bottom:4px;">Part-time / Freelance — Remote</div>
+            <p style="font-size:14px; color:#444; margin:0;">
+                Help improve the DriveMatch platform, build features, and fix bugs.
+            </p>
+        </div>
+    </div>
+
+    <div class="dm-card mb-4">
+        <h4 style="font-weight:700; margin-bottom:12px;">How to Apply</h4>
+        <p style="font-size:15px; color:#444; line-height:1.7; margin-bottom:10px;">
+            Send your CV and a short introduction to:
+        </p>
+        <div style="background:#f9f9f9; border-radius:8px; padding:14px 20px; font-size:15px; font-weight:600;">
+            careers@drivematch.com
+        </div>
+        <p style="font-size:13px; color:#999; margin-top:8px; margin-bottom:0;">
+            We will review your application and get back to you within 5 business days.
+        </p>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'main:about' %}" class="btn-dm-outline">Learn About Us</a>
+    </div>
+
+</div>
+{% endblock %}

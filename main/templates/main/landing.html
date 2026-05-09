@@ -1,0 +1,133 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}DriveMatch — Your Monthly Driver{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-landing">
+
+    <!-- Floating theme toggle (top right) -->
+    <div style="position:absolute; top:24px; right:32px; z-index:10;">
+        <button id="themeToggle" class="dm-theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+            <span id="themeIcon"></span>
+        </button>
+    </div>
+
+    <div class="dm-landing-grid">
+
+        <!-- ─── LEFT: Brand + Headline + Features ─── -->
+        <div class="dm-landing-left">
+
+            <!-- Brand mark -->
+            <div class="dm-landing-brand">
+                <span class="dm-landing-brand-mark">
+                    <i class="fa-solid fa-car-side"></i>
+                </span>
+                DriveMatch
+            </div>
+
+            <!-- Eyebrow tag -->
+            <div class="dm-landing-eyebrow">
+                <span class="dot"></span>
+                Trusted monthly drivers, on demand
+            </div>
+
+            <!-- Headline -->
+            <h1 class="dm-landing-title">Your monthly driver, made simple.</h1>
+
+            <p class="dm-landing-subtitle">
+                Find verified drivers for your daily commute &mdash; book by the month, ride with confidence,
+                and travel on your schedule. No surprises, just reliable service.
+            </p>
+
+            <!-- Feature highlights -->
+            <div class="dm-feature-row">
+                <div class="dm-feature-item">
+                    <span class="icon"><i class="fa-solid fa-circle-check"></i></span>
+                    <span class="text">Verified Drivers</span>
+                </div>
+                <div class="dm-feature-item">
+                    <span class="icon"><i class="fa-regular fa-clock"></i></span>
+                    <span class="text">On-Time Service</span>
+                </div>
+                <div class="dm-feature-item">
+                    <span class="icon"><i class="fa-solid fa-tag"></i></span>
+                    <span class="text">Best Prices</span>
+                </div>
+                <div class="dm-feature-item">
+                    <span class="icon"><i class="fa-solid fa-headset"></i></span>
+                    <span class="text">24/7 Support</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── RIGHT: Action Panel ─── -->
+        <div class="dm-landing-panel">
+            <h3 class="dm-landing-panel-title">Get started</h3>
+            <p class="dm-landing-panel-sub">Choose how you'd like to use DriveMatch.</p>
+
+            <!-- Register as Passenger (primary / highlighted) -->
+            <a href="{% url 'accounts:passenger_register' %}" class="dm-action-card primary">
+                <span class="left-icon"><i class="fa-regular fa-user"></i></span>
+                <span class="body">
+                    <span class="title">Register as Passenger</span>
+                    <span class="desc">Book a monthly driver in minutes</span>
+                </span>
+                <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Register as Driver -->
+            <a href="{% url 'drivers:driver_register_step1' %}" class="dm-action-card">
+                <span class="left-icon"><i class="fa-solid fa-id-card"></i></span>
+                <span class="body">
+                    <span class="title">Register as Driver</span>
+                    <span class="desc">Earn with your vehicle, your schedule</span>
+                </span>
+                <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Browse as Guest -->
+            <a href="{% url 'drivers:search_drivers' %}" class="dm-action-card">
+                <span class="left-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <span class="body">
+                    <span class="title">Browse as Guest</span>
+                    <span class="desc">Explore drivers without an account</span>
+                </span>
+                <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Divider -->
+            <div class="dm-landing-divider">Already a member</div>
+
+            <p class="dm-already-account">Already have an account?</p>
+
+            <!-- Sign In -->
+            <a href="{% url 'accounts:sign_in' %}" class="dm-action-card">
+                <span class="left-icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></span>
+                <span class="body">
+                    <span class="title">Sign In</span>
+                    <span class="desc">Access your dashboard</span>
+                </span>
+                <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <p class="dm-secure-note">
+                <i class="fa-solid fa-lock"></i>
+                Your data is safe and secure with us.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="dm-landing-footer">
+        <span>&copy; 2026 DriveMatch. All rights reserved.</span>
+        <div>
+            <a href="{% url 'main:privacy' %}">Privacy Policy</a>
+            <a href="{% url 'main:terms' %}">Terms of Service</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Home — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    {% if is_guest %}
+    <div class="dm-guest-banner mb-4">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>You're browsing as a guest.
+            <a href="{% url 'accounts:sign_in' %}">Sign in</a> to book drivers and access full features.
+        </span>
+    </div>
+    {% endif %}
+
+    <!-- ── HERO ─────────────────────────────────────────────── -->
+    <div class="dm-hero mb-4">
+        <div class="dm-hero-content">
+            <span class="dm-hero-eyebrow"><i class="fa-solid fa-circle-check"></i> Verified monthly drivers</span>
+            <h3>Find Your Trusted Monthly Driver</h3>
+            <p>Search verified drivers by route, time, and price — all in one place.</p>
+            <div class="hero-cta">
+                {% if is_guest %}
+                <a href="{% url 'accounts:sign_in' %}" class="btn-dm-black">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign in to Book
+                </a>
+                <a href="{% url 'drivers:search_drivers' %}" class="btn-dm-outline">
+                    <i class="fa-solid fa-magnifying-glass"></i> Browse Drivers
+                </a>
+                {% else %}
+                <a href="{% url 'drivers:search_drivers' %}" class="btn-dm-black">
+                    <i class="fa-solid fa-magnifying-glass"></i> Book Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ── POPULAR ROUTES ───────────────────────────────────── -->
+    <div class="dm-section-header">
+        <h5><span class="h-icon"><i class="fa-solid fa-location-dot"></i></span> Popular Routes</h5>
+        <a href="{% url 'drivers:search_drivers' %}" class="dm-section-link">View all routes <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="row g-2 mb-4">
+        {% for route in popular_routes %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="{% url 'drivers:search_drivers' %}?from_area={{ route.from_area }}&to_area={{ route.to_area }}"
+               class="dm-route-pill">
+                <strong>{{ route.from_area }}</strong>
+                <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
+                <strong>{{ route.to_area }}</strong>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="dm-empty">
+                <div class="empty-icon"><i class="fa-solid fa-route"></i></div>
+                <p>No routes available yet.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── TOP DRIVERS ──────────────────────────────────────── -->
+    <div class="dm-section-header">
+        <h5><span class="h-icon"><i class="fa-solid fa-star"></i></span> Top Drivers</h5>
+        <a href="{% url 'drivers:search_drivers' %}" class="dm-section-link">View all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="row g-3 mb-4">
+        {% for dr in top_drivers|slice:":3" %}
+        <div class="col-md-6 col-lg-4">
+            <div class="dm-driver-card h-100" style="border-radius:18px; padding:20px;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="driver-name" style="font-size:17px; font-weight:800; margin-bottom:4px;">
+                            {{ dr.driver.user.get_full_name }}
+                        </div>
+                        <div class="driver-rating">
+                            <i class="fa-solid fa-star"></i> {{ dr.driver.average_rating }}
+                        </div>
+                    </div>
+                    <span class="dm-verified-badge d-inline-block">
+                        <i class="fa-solid fa-circle-check"></i> Verified
+                    </span>
+                </div>
+
+                {% if dr.driver.vehicle %}
+                <div class="driver-route mt-2">
+                    <i class="fa-solid fa-car-side"></i>
+                    {{ dr.driver.vehicle.year }} · {{ dr.driver.vehicle.brand }} {{ dr.driver.vehicle.model }}
+                </div>
+                {% endif %}
+
+                <div class="driver-route mt-2">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ dr.route.from_area }} → {{ dr.route.to_area }}
+                </div>
+
+                <div style="border-top:1px solid var(--dm-border); margin:16px 0; padding-top:14px;">
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="driver-price">{{ dr.monthly_price }}</div>
+                            <div class="driver-price-unit">SAR / month</div>
+                        </div>
+                        <div class="driver-commit text-end">
+                            Commitment {{ dr.commitment_duration }} month{{ dr.commitment_duration|pluralize }}
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'drivers:driver_profile_view' dr.driver.id %}"
+                   class="btn-dm-outline btn-sm-dm w-100 text-center">View Profile</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="dm-empty">
+                <div class="empty-icon"><i class="fa-solid fa-user-tie"></i></div>
+                <p>No verified drivers available yet.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── LATEST RESERVATIONS + FAVORITES ─────────────────── -->
+    <div class="row g-4 mb-4">
+
+        <!-- Latest Reservations -->
+        {% if not is_guest %}
+        <div class="col-md-6">
+            <div class="dm-section-header">
+                <h5><span class="h-icon"><i class="fa-solid fa-calendar-days"></i></span> Latest Reservations</h5>
+                <a href="{% url 'bookings:my_bookings' %}" class="dm-section-link">View all <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="dm-card" style="padding:12px;">
+                {% for booking in latest_bookings|slice:":3" %}
+                <div class="dm-list-row {% if not forloop.last %}dm-border-bottom{% endif %}" style="padding:14px 8px;">
+                    <div>
+                        <div class="list-title">
+                            {{ booking.driver_route.route.from_area }} → {{ booking.driver_route.route.to_area }}
+                        </div>
+                        <div class="list-meta">
+                            <i class="fa-regular fa-calendar"></i> {{ booking.start_date }}
+                            <span class="dot-sep">·</span>
+                            <i class="fa-regular fa-clock"></i> {{ booking.driver_route.start_time }}
+                        </div>
+                    </div>
+                    <span class="badge-{{ booking.status|lower }}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="dm-empty">
+                    <div class="empty-icon"><i class="fa-regular fa-calendar"></i></div>
+                    <p>No reservations yet.
+                        <a href="{% url 'drivers:search_drivers' %}">Book a driver</a>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Favorite Drivers -->
+        {% if not is_guest %}
+        <div class="col-md-6">
+            <div class="dm-section-header">
+                <h5><span class="h-icon"><i class="fa-solid fa-heart"></i></span> Your Favorite Drivers</h5>
+                <a href="{% url 'drivers:my_favorites' %}" class="dm-section-link">View all <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="dm-card" style="padding:12px;">
+                <div class="row g-2">
+                    {% for fav in favorites|slice:":4" %}
+                    <div class="col-6">
+                        <a href="{% url 'drivers:driver_profile_view' fav.driver.id %}"
+                           class="dm-fav-card" style="border:1px solid var(--dm-border); border-radius:14px;">
+                            <div class="fav-name">{{ fav.driver.user.get_full_name }}</div>
+                            <div class="fav-rating">
+                                <i class="fa-solid fa-star"></i> {{ fav.driver.average_rating }}
+                            </div>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="dm-empty">
+                            <div class="empty-icon"><i class="fa-regular fa-heart"></i></div>
+                            <p>No favorites yet.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+   <!-- ── FEATURE / TRUST CARDS ────────────────────────────── -->
+<div class="dm-section-header">
+    <h5><span class="h-icon"><i class="fa-solid fa-sparkles"></i></span> Why DriveMatch</h5>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="dm-feature-card h-100">
+            <div class="feat-icon">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <strong>24/7 Support</strong>
+            <p>Our team is always here whenever you need help.</p>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="dm-feature-card h-100">
+            <div class="feat-icon">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+            <strong>Save Time</strong>
+            <p>Find the right driver fast — no calls, no hassle.</p>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="dm-feature-card h-100">
+            <div class="feat-icon">
+                <i class="fa-solid fa-tag"></i>
+            </div>
+            <strong>Best Prices</strong>
+            <p>Compare offers and choose what fits your budget.</p>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="dm-feature-card h-100">
+            <div class="feat-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <strong>Trusted Drivers</strong>
+            <p>Every driver is verified before joining the platform.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

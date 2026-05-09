@@ -1,0 +1,186 @@
+{% extends 'main/base.html' %}
+{% block title %}My Subscription — DriveMatch{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dm-dashboard-wrap">
+
+    <div class="dm-sidebar">
+        <div class="sidebar-logo">DriveMatch</div>
+        <nav style="margin-top:12px;">
+            <a href="{% url 'drivers:driver_dashboard' %}" class="sidebar-link">Dashboard</a>
+            <a href="{% url 'drivers:driver_trips' %}" class="sidebar-link">My Trips</a>
+            <a href="{% url 'drivers:trips_table' %}" class="sidebar-link">Trips Table</a>
+            <a href="{% url 'drivers:subscribers' %}" class="sidebar-link">Subscribers</a>
+            <a href="{% url 'drivers:earnings' %}" class="sidebar-link">Earnings</a>
+            <a href="{% url 'drivers:driver_ratings' %}" class="sidebar-link">Ratings</a>
+            <a href="{% url 'drivers:driver_complaints' %}" class="sidebar-link">Complaints</a>
+            <a href="{% url 'drivers:driver_more' %}" class="sidebar-link active">More</a>
+        </nav>
+    </div>
+
+    <div class="dm-main-content">
+        <div style="margin-bottom:16px;">
+            <a href="{% url 'drivers:driver_more' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> More</a>
+        </div>
+
+        <div class="dm-page-header">
+            <h2>My Subscription</h2>
+            <p>Manage and renew your subscription plan.</p>
+        </div>
+
+        <!-- Current Plan -->
+        {% if current_sub %}
+        <div class="dm-card mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p style="font-size:13px; color:#666; margin-bottom:4px;">Current Plan</p>
+                    <h3 style="font-weight:800; margin-bottom:4px;">{{ current_sub.plan.name }}</h3>
+                    <div style="font-size:24px; font-weight:700; margin-bottom:12px;">
+                        {{ current_sub.plan.price|floatformat:0 }}
+                        <span style="font-size:14px; font-weight:400; color:#666;">SAR</span>
+                    </div>
+                    <div class="dm-card-sm" style="background:#f9f9f9; font-size:13px;">
+                        <div class="contract-row">
+                            <span class="label">Start Date</span>
+                            <span class="value">{{ current_sub.start_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="contract-row">
+                            <span class="label">End Date</span>
+                            <span class="value">{{ current_sub.end_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="contract-row">
+                            <span class="label">Duration</span>
+                            <span class="value">{{ current_sub.plan.duration_days }} days</span>
+                        </div>
+                        <div class="contract-row">
+                            <span class="label">Status</span>
+                            <span class="value">
+                                {% if current_sub.is_active %}
+                                    <span class="badge-active">Active</span>
+                                {% else %}
+                                    <span class="badge-completed">Expired</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p style="font-size:13px; font-weight:600; margin-bottom:10px;">Plan Includes</p>
+                    <ul style="list-style:none; padding:0; font-size:14px; line-height:2;">
+                        <li><i class="fa-solid fa-check"></i> Receive booking requests</li>
+                        <li><i class="fa-solid fa-check"></i> In-app support</li>
+                        <li><i class="fa-solid fa-check"></i> Cancel anytime</li>
+                        <li><i class="fa-solid fa-check"></i> Access to all features</li>
+                    </ul>
+                    {% if current_sub.plan.description %}
+                    <p style="font-size:13px; color:#666; margin-top:8px;">
+                        {{ current_sub.plan.description }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="dm-card mb-4" style="text-align:center; padding:32px;">
+            <div style="font-size:36px; margin-bottom:12px;"><i class="fa-solid fa-clipboard-list"></i></div>
+            <h5>No active subscription</h5>
+            <p style="font-size:14px; color:#666;">
+                You don't have an active subscription yet.
+                Please contact support to get set up.
+            </p>
+            <a href="{% url 'support:contact' %}" class="btn-dm-black" style="margin-top:8px;">
+                Contact Support
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Available Plans -->
+        <h5 style="font-weight:700; margin-bottom:16px;">Available Plans</h5>
+        <div class="row g-3 mb-4">
+            {% for plan in available_plans %}
+            <div class="col-md-3 col-sm-6">
+                <div class="dm-card" style="text-align:center; height:100%;
+                     {% if current_sub and current_sub.plan == plan %}border:2px solid #111;{% endif %}">
+                    <h6 style="font-weight:700; margin-bottom:6px;">{{ plan.name }}</h6>
+                    <div style="font-size:26px; font-weight:800; margin-bottom:4px;">
+                        {{ plan.price|floatformat:0 }}
+                        <span style="font-size:13px; font-weight:400; color:#666;">SAR</span>
+                    </div>
+                    <div style="font-size:12px; color:#999; margin-bottom:12px;">
+                        / {{ plan.duration_days }} days
+                    </div>
+                    <hr>
+                    {% if current_sub and current_sub.plan == plan %}
+                        <div class="btn-dm-black" style="width:100%; cursor:default;">
+                            Current Plan
+                        </div>
+                    {% else %}
+                        <!-- Placeholder — real upgrade would need payment -->
+                        <a href="{% url 'support:contact' %}"
+                           class="btn-dm-outline d-block" style="width:100%;">
+                            {% if plan.price == 0 %}Start Free Trial{% else %}Upgrade{% endif %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted" style="font-size:14px;">No plans available.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Subscription History -->
+        <h5 style="font-weight:700; margin-bottom:16px;">Subscription History</h5>
+        <div class="dm-card p-0">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Duration</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in all_subs %}
+                    <tr>
+                        <td style="font-size:13px; color:#666;">
+                            {{ sub.start_date|date:"d M Y" }}
+                        </td>
+                        <td style="font-weight:600; font-size:14px;">{{ sub.plan.name }}</td>
+                        <td style="font-size:13px; color:#666;">
+                            {{ sub.start_date|date:"d M Y" }} →
+                            {{ sub.end_date|date:"d M Y" }}
+                        </td>
+                        <td style="font-weight:600;">{{ sub.plan.price|floatformat:0 }} SAR</td>
+                        <td>
+                            {% if sub.is_active %}
+                                <span class="badge-active">Active</span>
+                            {% else %}
+                                <span class="badge-completed">Expired</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No subscription history.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dm-card-sm mt-4" style="font-size:13px; color:#666;">
+            ℹ Need help with your subscription?
+            <a href="{% url 'support:contact' %}">Contact our support team</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

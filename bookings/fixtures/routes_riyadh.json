@@ -1,0 +1,67 @@
+[
+  {
+    "model": "bookings.route",
+    "pk": 1,
+    "fields": {
+      "name": "الملز إلى العليا",
+      "start_point": "حي الملز",
+      "end_point": "حي العليا",
+      "city": "الرياض",
+      "distance_km": 8.5,
+      "estimated_time_minutes": 20,
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookings.route",
+    "pk": 2,
+    "fields": {
+      "name": "الرحمانية إلى النخيل",
+      "start_point": "حي الرحمانية",
+      "end_point": "حي النخيل",
+      "city": "الرياض",
+      "distance_km": 6.2,
+      "estimated_time_minutes": 15,
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookings.route",
+    "pk": 3,
+    "fields": {
+      "name": "الشميسي إلى البطحاء",
+      "start_point": "حي الشميسي",
+      "end_point": "حي البطحاء",
+      "city": "الرياض",
+      "distance_km": 7.0,
+      "estimated_time_minutes": 25,
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookings.route",
+    "pk": 4,
+    "fields": {
+      "name": "المروج إلى حطين",
+      "start_point": "حي المروج",
+      "end_point": "حي حطين",
+      "city": "الرياض",
+      "distance_km": 5.5,
+      "estimated_time_minutes": 12,
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookings.route",
+    "pk": 5,
+    "fields": {
+      "name": "الورود إلى الغدير",
+      "start_point": "حي الورود",
+      "end_point": "حي الغدير",
+      "city": "الرياض",
+      "distance_km": 9.0,
+      "estimated_time_minutes": 22,
+      "is_active": true
+    }
+  }
+]

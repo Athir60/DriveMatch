@@ -1,0 +1,141 @@
+{% extends 'main/base.html' %}
+{% block title %}Book Driver — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:620px;">
+
+    <a href="{% url 'drivers:driver_profile_view' driver_profile.id %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Profile</a>
+
+    <h2 style="font-weight:700; margin:16px 0 4px;">Booking</h2>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Trip Summary -->
+        <div class="dm-card mb-3">
+            <div class="contract-row">
+                <span class="label">Route</span>
+                <span class="value">
+                    {{ driver_route.route.from_area }} → {{ driver_route.route.to_area }}
+                </span>
+            </div>
+            <div class="contract-row">
+                <span class="label">Passenger</span>
+                <span class="value">{{ request.user.get_full_name }}</span>
+            </div>
+            <div class="contract-row">
+                <span class="label">Commitment Duration</span>
+                <span class="value">{{ driver_route.commitment_duration }} Month{{ driver_route.commitment_duration|pluralize }}</span>
+            </div>
+            {% if driver_profile.vehicle %}
+            <div class="contract-row">
+                <span class="label">Car</span>
+                <span class="value">
+                    {{ driver_profile.vehicle.brand }} {{ driver_profile.vehicle.model }}
+                    {{ driver_profile.vehicle.year }} — {{ driver_profile.vehicle.color }}
+                </span>
+            </div>
+            {% endif %}
+            <div class="contract-row">
+                <span class="label">Trip Time</span>
+                <span class="value">{{ driver_route.start_time }} – {{ driver_route.end_time }}</span>
+            </div>
+        </div>
+
+        <!-- Subscription Duration -->
+        <div class="dm-card mb-3">
+            <h6 style="font-weight:700; margin-bottom:4px;">Subscription Duration</h6>
+            <p style="font-size:13px; color:#666; margin-bottom:14px;">
+                Select a duration up to {{ max_months }} month{{ max_months|pluralize }}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                {% for val, label in form.subscription_months.field.choices %}
+                <label style="cursor:pointer;">
+                    <input type="radio" name="subscription_months" value="{{ val }}"
+                           {% if forloop.first %}checked{% endif %}
+                           style="display:none;" class="month-radio">
+                    <span class="month-btn btn-dm-outline" style="padding:8px 16px; font-size:14px; display:inline-block;">
+                        {{ label }}
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+            {% if form.subscription_months.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:6px;">{{ form.subscription_months.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Price Details -->
+        <div class="dm-card mb-3">
+            <h6 style="font-weight:700; margin-bottom:12px;">Price Details</h6>
+            <div class="contract-row">
+                <span class="label">Monthly Price</span>
+                <span class="value" id="monthly-price-value" data-price="{{ driver_route.monthly_price }}">
+                    {{ driver_route.monthly_price }} SAR
+                </span>
+            </div>
+            <div class="contract-row">
+                <span class="label">Duration</span>
+                <span class="value" id="selected-months">1 Month</span>
+            </div>
+            <div class="contract-row" style="border-top:1px solid #eee; padding-top:12px; margin-top:4px;">
+                <span class="label" style="font-weight:700; font-size:15px;">Total</span>
+                <span class="value" style="font-size:20px; font-weight:700;" id="total-price">
+                    {{ driver_route.monthly_price }} SAR
+                </span>
+            </div>
+        </div>
+
+
+        <!-- Agreement -->
+        <div class="dm-card mb-4">
+            <div class="d-flex align-items-start gap-3">
+                {{ form.agreed_to_terms }}
+                <label style="font-size:14px; line-height:1.5;">
+                    I agree to the
+                    <a href="{% url 'main:terms' %}" target="_blank">terms and conditions</a>
+                    and the cancellation and refund policy.
+                </label>
+            </div>
+            {% if form.agreed_to_terms.errors %}
+                <div class="text-danger" style="font-size:12px; margin-top:6px;">{{ form.agreed_to_terms.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-dm-black w-100" style="font-size:16px; padding:14px;">Pay</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const radios = document.querySelectorAll('.month-radio');
+const totalEl = document.getElementById('total-price');
+const monthsEl = document.getElementById('selected-months');
+const monthlyPrice = parseFloat(document.getElementById('monthly-price-value').dataset.price);
+
+radios.forEach(radio => {
+    radio.addEventListener('change', function() {
+        const m = parseInt(this.value);
+        totalEl.textContent = (monthlyPrice * m).toFixed(2) + ' SAR';
+        monthsEl.textContent = m + ' Month' + (m > 1 ? 's' : '');
+        // Highlight selected
+        document.querySelectorAll('.month-btn').forEach(btn => {
+            btn.style.background = '';
+            btn.style.color = '';
+        });
+        this.nextElementSibling.style.background = '#111';
+        this.nextElementSibling.style.color = '#fff';
+    });
+});
+// Highlight first option
+if (radios.length) radios[0].dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

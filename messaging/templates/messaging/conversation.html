@@ -1,0 +1,134 @@
+{% extends 'main/base.html' %}
+{% block title %}Conversation — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:760px;">
+
+    <div style="margin-bottom:14px;">
+        {% if is_passenger %}
+        <a href="{% url 'messaging:passenger_threads' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Messages</a>
+        {% else %}
+        <a href="{% url 'messaging:driver_threads' %}" class="dm-back-link"><i class="fa-solid fa-arrow-left"></i> Messages</a>
+        {% endif %}
+    </div>
+
+    <!-- Header -->
+    <div class="dm-card mb-3" style="padding:14px 18px; display:flex; align-items:center; gap:14px;">
+        <div style="width:44px; height:44px; background:#f0f0f0; border-radius:50%; border:1px solid #e0e0e0;
+                    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#666;">
+            {% if is_passenger %}{{ thread.driver.user.first_name|first|upper }}{{ thread.driver.user.last_name|first|upper }}
+            {% else %}{{ thread.passenger.user.first_name|first|upper }}{{ thread.passenger.user.last_name|first|upper }}{% endif %}
+        </div>
+        <div>
+            <div style="font-weight:700; font-size:15px;">
+                {% if is_passenger %}{{ thread.driver.user.get_full_name|default:thread.driver.user.username }} <span style="font-size:12px; color:#888;">Driver</span>
+                {% else %}{{ thread.passenger.user.get_full_name|default:thread.passenger.user.username }} <span style="font-size:12px; color:#888;">Passenger</span>{% endif %}
+            </div>
+            {% if thread.booking %}
+            <div style="font-size:12px; color:#888;">
+                Booking #{{ thread.booking.id }} &mdash; {{ thread.booking.driver_route.route.from_area }} &rarr; {{ thread.booking.driver_route.route.to_area }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% for msg in messages %}
+    <div class="alert {{ msg.tags }} alert-dismissible fade show">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <!-- Messages -->
+    <div class="dm-card p-0 mb-3" style="min-height:380px; max-height:480px; overflow-y:auto; background:#fafafa;" id="chatArea">
+        {% if chat_messages %}
+        <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
+            {% for msg in chat_messages %}
+            {% if msg.sender == request.user %}
+            <div style="align-self:flex-end; max-width:72%; text-align:right;">
+                <div style="background:#111; color:#fff; border-radius:14px 14px 4px 14px; padding:10px 14px; font-size:14px; display:inline-block; text-align:left;">
+                    {% if msg.has_location %}<div><a href="{{ msg.maps_url }}" target="_blank" rel="noopener" style="color:#a8d8ff; font-size:13px;">View shared location &rarr;</a>{% if msg.location_label %}<div style="font-size:12px; margin-top:2px;">{{ msg.location_label }}</div>{% endif %}</div>{% endif %}
+                    {% if msg.text %}{{ msg.text }}{% endif %}
+                </div>
+                <div style="font-size:11px; color:#aaa; margin-top:3px;">{{ msg.created_at|date:"H:i" }}</div>
+            </div>
+            {% else %}
+            <div style="align-self:flex-start; max-width:72%;">
+                <div style="background:#fff; border:1px solid #e0e0e0; border-radius:14px 14px 14px 4px; padding:10px 14px; font-size:14px; display:inline-block;">
+                    {% if msg.has_location %}<div><a href="{{ msg.maps_url }}" target="_blank" rel="noopener" style="color:#0066cc; font-size:13px;">View shared location &rarr;</a>{% if msg.location_label %}<div style="font-size:12px; margin-top:2px; color:#666;">{{ msg.location_label }}</div>{% endif %}</div>{% endif %}
+                    {% if msg.text %}{{ msg.text }}{% endif %}
+                </div>
+                <div style="font-size:11px; color:#aaa; margin-top:3px;">{{ msg.sender.get_full_name|default:msg.sender.username }} &mdash; {{ msg.created_at|date:"H:i" }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="display:flex; align-items:center; justify-content:center; height:340px; color:#bbb; font-size:14px; flex-direction:column; gap:8px;">
+            <div style="font-size:28px; color:#ddd;">[ ]</div>
+            <p style="margin:0;">No messages yet. Start the conversation.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Form -->
+    <div class="dm-card p-0" style="overflow:hidden;">
+        <form method="POST" id="msgForm">
+            {% csrf_token %}
+            <input type="hidden" name="location_lat" id="locLat">
+            <input type="hidden" name="location_lng" id="locLng">
+            <input type="hidden" name="location_label" id="locLabel">
+            <div id="locPreview" style="display:none; padding:8px 14px; background:#e8f5e9; border-bottom:1px solid #c8e6c9; font-size:13px; color:#2e7d32;"></div>
+            <div style="display:flex; align-items:center;">
+                <button type="button" onclick="shareLocation()" title="Share Location"
+                        style="background:none; border:none; border-right:1px solid #e0e0e0;
+                               padding:14px 16px; cursor:pointer; color:#666; font-size:20px;
+                               font-weight:300; line-height:1; flex-shrink:0;">+</button>
+                <textarea name="text" id="msgText" rows="1" placeholder="Type a message..."
+                          style="flex:1; border:none; padding:13px 14px; font-size:14px;
+                                 resize:none; outline:none; background:transparent; font-family:inherit;"
+                          oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
+                <button type="submit"
+                        style="background:#111; color:#fff; border:none; padding:10px 20px;
+                               font-size:14px; font-weight:600; cursor:pointer; flex-shrink:0; min-height:48px;">
+                    Send
+                </button>
+            </div>
+        </form>
+        <p style="font-size:11px; color:#aaa; padding:3px 14px 8px; margin:0;">Click + to share your current location</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.addEventListener('load', function() {
+    var a = document.getElementById('chatArea');
+    if (a) a.scrollTop = a.scrollHeight;
+});
+function shareLocation() {
+    if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        var lat = pos.coords.latitude, lng = pos.coords.longitude;
+        document.getElementById('locLat').value = lat;
+        document.getElementById('locLng').value = lng;
+        document.getElementById('locLabel').value = 'My current location';
+        var prev = document.getElementById('locPreview');
+        prev.style.display = 'block';
+        prev.textContent = 'Location ready: ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ' — Click + again to update. ';
+        var rm = document.createElement('button');
+        rm.type = 'button'; rm.textContent = 'Remove'; rm.onclick = clearLocation;
+        rm.style.cssText = 'background:none;border:none;color:#c62828;font-size:12px;cursor:pointer;margin-left:8px;';
+        prev.appendChild(rm);
+    }, function() { alert('Could not get location. Please allow location access.'); });
+}
+function clearLocation() {
+    ['locLat','locLng','locLabel'].forEach(function(id){ document.getElementById(id).value=''; });
+    var prev = document.getElementById('locPreview');
+    prev.style.display = 'none'; prev.textContent = '';
+}
+document.getElementById('msgText').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('msgForm').submit(); }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'main/base.html' %}
+{% block title %}Find a Driver — DriveMatch{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% if not request.user.is_authenticated %}
+<div class="alert alert-warning text-center mb-4" style="font-size:14px;">
+    You're browsing as a guest. 
+    <a href="{% url 'accounts:sign_in' %}?next={{ request.path }}">Sign in</a> to book drivers and save favorites.
+</div>
+{% endif %}
+
+    <div class="dm-page-header">
+        <h2>Find a driver that suits your needs</h2>
+        <p>Choose your driver and view the best available options</p>
+    </div>
+
+    <!-- Search Filters -->
+    <div class="dm-card mb-4">
+        <h6 style="font-weight:700; margin-bottom:16px;">Search Filters</h6>
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="dm-label">From (A)</label>
+                    <select name="from_area" class="form-select">
+                        <option value="">All Areas</option>
+                        {% for route in routes %}
+                        <option value="{{ route.from_area }}" {% if from_area == route.from_area %}selected{% endif %}>
+                            {{ route.from_area }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="dm-label">To (B)</label>
+                    <select name="to_area" class="form-select">
+                        <option value="">All Areas</option>
+                        {% for route in routes %}
+                        <option value="{{ route.to_area }}" {% if to_area == route.to_area %}selected{% endif %}>
+                            {{ route.to_area }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Car Type</label>
+                    <select name="car_type" class="form-select">
+                        <option value="">All Types</option>
+                        {% for val, label in car_types %}
+                        <option value="{{ val }}" {% if car_type == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Min Rating</label>
+                    <select name="min_rating" class="form-select">
+                        <option value="">Any Rating</option>
+                        <option value="3" {% if min_rating == "3" %}selected{% endif %}>3+ Stars</option>
+                        <option value="4" {% if min_rating == "4" %}selected{% endif %}>4+ Stars</option>
+                        <option value="4.5" {% if min_rating == "4.5" %}selected{% endif %}>4.5+ Stars</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="dm-label">Max Price (SAR)</label>
+                    <input type="number" name="max_price" class="form-control"
+                           placeholder="e.g. 1500" value="{{ max_price }}">
+                </div>
+            </div>
+
+            <!-- Time filter row -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label class="dm-label">Available From</label>
+                    <select name="from_time" class="form-select">
+                        <option value="">Any Start Time</option>
+                        {% for t in time_choices %}
+                        <option value="{{ t }}" {% if from_time == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="dm-label">Available Until</label>
+                    <select name="to_time" class="form-select">
+                        <option value="">Any End Time</option>
+                        {% for t in time_choices %}
+                        <option value="{{ t }}" {% if to_time == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort + action buttons -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label class="dm-label">Sort By</label>
+                    <select name="sort_by" class="form-select">
+                        <option value="rating" {% if sort_by == "rating" %}selected{% endif %}>Highest Rated</option>
+                        <option value="price_low" {% if sort_by == "price_low" %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_by == "price_high" %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn-dm-black w-100">Search</button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{% url 'drivers:search_drivers' %}" class="btn-dm-outline w-100">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <span style="font-size:14px; color:#666;">
+            Found <strong>{{ drivers.paginator.count }}</strong> driver{{ drivers.paginator.count|pluralize }}
+        </span>
+        <span style="font-size:13px; color:#666;">Sort by: {{ sort_by|title }}</span>
+    </div>
+
+    <!-- Driver result cards -->
+    {% for dr in drivers %}
+    <div class="dm-driver-card">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <div style="display:flex; align-items:flex-start; gap:16px;">
+                    <!-- Profile photo or text placeholder — NO emojis -->
+                    {% if dr.driver.profile_photo %}
+                    <img src="{{ dr.driver.profile_photo.url }}"
+                         alt="{{ dr.driver.user.get_full_name }}"
+                         style="width:70px; height:70px; border-radius:8px; border:1px solid #e0e0e0;
+                                object-fit:cover; flex-shrink:0;">
+                    {% else %}
+                    <div style="width:70px; height:70px; background:#f0f0f0; border-radius:8px;
+                                border:1px solid #e0e0e0; display:flex; align-items:center;
+                                justify-content:center; font-size:16px; font-weight:700;
+                                color:#aaa; flex-shrink:0;">
+                        {{ dr.driver.user.first_name|first|upper }}{{ dr.driver.user.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="driver-name">{{ dr.driver.user.get_full_name|default:dr.driver.user.username }}</div>
+                        <div class="driver-rating" style="margin:4px 0;">
+                            {{ dr.driver.average_rating }} / 5
+                            <span style="font-size:12px; color:#999;">({{ dr.driver.total_trips }} trips)</span>
+                        </div>
+                        {% if dr.driver.vehicle %}
+                        <div class="driver-route">
+                            {{ dr.driver.vehicle.year }} {{ dr.driver.vehicle.brand }} {{ dr.driver.vehicle.model }}
+                            — {{ dr.driver.vehicle.get_car_type_display }}
+                        </div>
+                        {% endif %}
+                        <div class="driver-route">
+                            Route: {{ dr.route.from_area }} to {{ dr.route.to_area }}
+                        </div>
+                        <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
+                            {% for day in dr.get_days_list %}
+                            <span style="background:#f0f0f0; border-radius:4px; padding:2px 8px; font-size:11px;">{{ day }}</span>
+                            {% endfor %}
+                        </div>
+                        <div style="font-size:13px; color:#666; margin-top:4px;">
+                            {{ dr.start_time }} &ndash; {{ dr.end_time }}
+                        </div>
+                        <span class="dm-verified-badge mt-2 d-inline-block">Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 text-end">
+                <div class="driver-price">{{ dr.monthly_price }}</div>
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">SAR / month</div>
+                <div style="font-size:12px; color:#666;">
+                    Commitment<br>
+                    <strong>{{ dr.commitment_duration }} Month{{ dr.commitment_duration|pluralize }}</strong>
+                </div>
+            </div>
+
+            <div class="col-md-2 text-end">
+                <a href="{% url 'drivers:driver_profile_view' dr.driver.id %}"
+                   class="btn-dm-outline d-block mb-2" style="font-size:13px;">View Profile</a>
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'bookings:book_driver' dr.id %}"
+                   class="btn-dm-black d-block" style="font-size:13px;">Book Now</a>
+                {% else %}
+                <a href="{% url 'accounts:sign_in' %}?next={{ request.path }}"
+                   class="btn-dm-outline d-block" style="font-size:13px;">Sign In to Book</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="dm-card text-center py-5 text-muted">
+        <div style="font-size:36px; font-weight:300; color:#ccc; margin-bottom:12px;">[ ]</div>
+        <h5>No drivers found</h5>
+        <p>Try adjusting your search filters.</p>
+        <a href="{% url 'drivers:search_drivers' %}" class="btn-dm-outline">Clear Filters</a>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if drivers.has_other_pages %}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        {% if drivers.has_previous %}
+            <a href="?page={{ drivers.previous_page_number }}&from_area={{ from_area }}&to_area={{ to_area }}&sort_by={{ sort_by }}&from_time={{ from_time }}&to_time={{ to_time }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Prev</a>
+        {% endif %}
+        <span class="btn-dm-black" style="padding:6px 14px; font-size:13px; cursor:default;">
+            {{ drivers.number }} / {{ drivers.paginator.num_pages }}
+        </span>
+        {% if drivers.has_next %}
+            <a href="?page={{ drivers.next_page_number }}&from_area={{ from_area }}&to_area={{ to_area }}&sort_by={{ sort_by }}&from_time={{ from_time }}&to_time={{ to_time }}"
+               class="btn-dm-outline" style="padding:6px 14px; font-size:13px;">Next <i class="fa-solid fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
