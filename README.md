@@ -6,7 +6,6 @@ DriveMatch is a Django-based web application designed to connect passengers with
 The system also provides a dedicated driver side, where drivers can register, upload required documents, add vehicle information, manage routes and availability, view trips, track earnings, manage subscriptions, and communicate with passengers.
 
 Guests can access the platform with limited permissions. They can browse general pages, view public information, search or explore available drivers with limited access, and create a passenger or driver account. However, main actions such as booking, messaging, viewing personal bookings, and completing payments require login.
-
 ## 👥 Team Members
 - Sharifah Aljuhani
 - Atheer Alharthi
